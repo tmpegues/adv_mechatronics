@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
+#include "pegues_lib.h"
+
 
 #define PWMDIV 3000
 #define WRAP 1000
 #define SERVO 16
 
-#define PWM_MIN 0
-#define PWM_MAX 100
+#define DUTY_MIN 0
+#define DUTY_MAX 10
+
 
 void init_pwm()
 {
@@ -19,38 +22,40 @@ void init_pwm()
     pwm_set_gpio_level(SERVO, 0);
 }
 
-float deg_to_pwm(float angle)
+uint16_t deg_to_pwm(float angle)
 {
     float angle_prop = (angle / 180.0);
-    float pwm_range = ((float)PWM_MAX - (float)PWM_MIN);
-    float duty = angle_prop*pwm_range + PWM_MIN;
-    printf("angle prop: %f, pwm_range: %f, duty: %f, angle: %f\n", angle_prop, pwm_range, duty, angle);
-    return duty;
+    float pwm_range = ((float)DUTY_MAX - (float)DUTY_MIN);
+    uint16_t pwm_val = (angle_prop * pwm_range + DUTY_MIN) / 100 * WRAP;
+    printf("angle prop: %.2f, pwm_range: %.0f, angle: %.2f, pwm: %u\n", angle_prop, pwm_range, angle, pwm_val);
+    return pwm_val;
+}
+
+uint16_t pwm_sweep()
+{
+    static uint16_t step = DUTY_MIN - 1;
+
+    step++;
+    if (step > DUTY_MAX)
+    {
+        step = DUTY_MIN;
+    }
+    printf("step: %u\n", step);
+    return step;
 }
 
 int main()
 {
     stdio_init_all();
+    int rc = init_led();
     init_pwm();
+    await_usb();
 
+    printf("Starting sweep\n");
     while (true)
     {
-        for (int i = 0; i <= 360; i++)
-        {
-            printf("\n");
-            float duty;
-            printf("i: %d\n", i);
-            if (i <= 180)
-            {
-                duty = deg_to_pwm(i);
-            }
-            else
-            {
-                duty = deg_to_pwm(360 - i);
-            }
-            printf("duty: %f\n",duty);
-            pwm_set_gpio_level(SERVO, duty);
-            sleep_ms(100);
-        }
+        pwm_set_gpio_level(SERVO, pwm_sweep());
+        sleep_ms(200);
+        toggle_led(0);
     }
 }

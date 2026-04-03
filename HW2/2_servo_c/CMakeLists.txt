@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(2_servo_c 2_servo_c.c )
+add_executable(2_servo_c 2_servo_c.c pegues_lib.c)
 
 pico_set_program_name(2_servo_c "2_servo_c")
 pico_set_program_version(2_servo_c "0.1")
@@ -48,15 +48,18 @@ pico_enable_stdio_usb(2_servo_c 1)
 target_link_libraries(2_servo_c
         pico_stdlib
         hardware_pwm)
+
+if (PICO_CYW43_SUPPORTED)
+    target_link_libraries(2_servo_c pico_cyw43_arch_none)
+endif()
+
 # Add the standard include files to the build
 target_include_directories(2_servo_c PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
 # Add any user requested libraries
-target_link_libraries(2_servo_c
-
-        )
+target_link_libraries(2_servo_c)
 
 pico_add_extra_outputs(2_servo_c)
 
