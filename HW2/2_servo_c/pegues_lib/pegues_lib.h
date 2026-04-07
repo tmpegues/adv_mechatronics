@@ -9,8 +9,15 @@
 #include "pico/cyw43_arch.h"
 #endif
 
-void toggle_led(int state); // state -1 or 1 sets LED to off or on. state 0 toggles from whatever it currently is.
-int init_led(); // init built in LED
-void await_usb(); // Waits for USB serial connection.
+
+// init built in LED
+int init_led();
+
+// state -1 or 1 sets LED to off or on. state 0 toggles current state.
+void toggle_led(int state);
+
+// Waits for USB serial connection.
+// If await_seconds = 0, it will wait indefinitely
+void await_usb(float await_seconds);
 
 #endif

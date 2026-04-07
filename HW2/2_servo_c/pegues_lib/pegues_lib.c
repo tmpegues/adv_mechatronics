@@ -5,7 +5,6 @@
 #endif
 
 // Turn the led on or off, I use it to know that the loop is running properly
-
 void toggle_led(int state)
 {
     static bool led_on = true;
@@ -45,29 +44,49 @@ int init_led()
 #endif
 }
 
-void await_usb()
+void await_usb(float await_seconds)
 {
-    while (!stdio_usb_connected())
+    int await_sleep = 50;
+    bool indefinite = false;
+    if (await_seconds == 0)
+    {
+        indefinite = true;
+    }
+    int max_loops = await_seconds * 1000.0 / await_sleep;
+    int await_loop = 0;
+    while (!stdio_usb_connected() && (indefinite || await_loop <= max_loops + 1))
     {
         printf("Seeking USB\n");
         toggle_led(0);
-        sleep_ms(50); // Blink fast while waiting
+        sleep_ms(await_sleep); // Blink fast while waiting
+        await_loop++;
     }
-    // Blink pattern to indicate connected
-    for (int i = 0; i <= 10; i++)
+    toggle_led(-1);
+
+    // SOS pattern to indicate connected
+    int blink_delay = 50;
+    for (int i = 0; i <= 3; i++)
     {
-        toggle_led(0);
-        sleep_ms(20);
+        toggle_led(1);
+        sleep_ms(blink_delay);
+        toggle_led(-1);
+        sleep_ms(blink_delay);
     }
-    for (int i = 0; i <= 10; i++)
+    sleep_ms(blink_delay * 3);
+    for (int i = 0; i <= 3; i++)
     {
-        toggle_led(0);
-        sleep_ms(100);
+        toggle_led(1);
+        sleep_ms(blink_delay * 3);
+        toggle_led(-1);
+        sleep_ms(blink_delay);
     }
-    for (int i = 0; i <= 10; i++)
+    sleep_ms(blink_delay * 3);
+    for (int i = 0; i <= 3; i++)
     {
-        toggle_led(0);
-        sleep_ms(20);
+        toggle_led(1);
+        sleep_ms(blink_delay);
+        toggle_led(-1);
+        sleep_ms(blink_delay);
     }
-    printf("USB Serial Connected\n");
+    printf("USB serial connected after %d loops\n", await_loop);
 }
