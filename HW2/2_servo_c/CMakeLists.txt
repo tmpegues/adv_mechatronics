@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(2_servo_c 2_servo_c.c ./pegues_lib/pegues_lib.c)
+add_executable(2_servo_c 2_servo_c.c ../../pegues_lib/pegues_lib.c)
 
 pico_set_program_name(2_servo_c "2_servo_c")
 pico_set_program_version(2_servo_c "0.1")

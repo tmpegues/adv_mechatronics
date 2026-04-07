@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
-#include "./pegues_lib/pegues_lib.h"
+#include "../../pegues_lib/pegues_lib.h"
 
 #define PWMDIV 60 // must be between 1-255
 #define WRAP 50000
