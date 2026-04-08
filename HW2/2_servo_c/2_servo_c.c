@@ -63,8 +63,8 @@ void pwm_sweep()
 
 int main()
 {
-    stdio_init_all();
-    int rc = init_led();
+    // stdio_init_all();
+    // int rc = init_led();
     await_usb(0);
     init_pwm();
 
