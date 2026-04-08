@@ -49,7 +49,17 @@ void write_mcp23008_gpio(int pin, uint state)
     uint8_t buf[2];
     buf[0] = GPIO_ADDR;
     buf[1] = state << pin;
-    i2c_write_blocking(i2c_default, ADDR, buf, 2, false);
+    i2c_write_blocking(I2C_PORT, ADDR, buf, 2, false);
+}
+
+bool read_mcp23008_gpio(int pin)
+{
+    uint8_t buf;
+    uint8_t reg = GPIO_ADDR;
+    i2c_write_blocking(i2c_default, ADDR, &reg, 1, true); // true to keep host control of bus
+    i2c_read_blocking(i2c_default, ADDR, &buf, 1, false); // false - finished with bus
+    bool state = buf >> pin && 1u;
+    return state;
 }
 
 int main()
@@ -58,13 +68,12 @@ int main()
 
     init_mcp23008();
 
-    int on = 0;
     while (true)
     {
         toggle_led(0);
-        printf("%d\n",on);
+        bool on = read_mcp23008_gpio(0);
+        printf("%d \n", on);
         write_mcp23008_gpio(7, on);
-        on = (on+1)%2;
         sleep_ms(1000);
     }
 }
