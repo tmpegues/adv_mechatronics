@@ -46,6 +46,8 @@ int init_led()
 
 void await_usb(float await_seconds)
 {
+    stdio_init_all();
+    int rc = init_led();
     int await_sleep = 50;
     bool indefinite = false;
     if (await_seconds == 0)
@@ -56,7 +58,6 @@ void await_usb(float await_seconds)
     int await_loop = 0;
     while (!stdio_usb_connected() && (indefinite || await_loop <= max_loops + 1))
     {
-        printf("Seeking USB\n");
         toggle_led(0);
         sleep_ms(await_sleep); // Blink fast while waiting
         await_loop++;
