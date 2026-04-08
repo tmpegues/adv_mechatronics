@@ -6,27 +6,37 @@
 // I2C defines
 // This example will use I2C0 on GPIO8 (SDA) and GPIO9 (SCL) running at 400KHz.
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
-#define I2C_PORT i2c0
-#define I2C_SDA 8
-#define I2C_SCL 9
+#define I2C_PORT i2c_default
+#define I2C_SDA 4 // Pin 6
+#define I2C_SCL 5 // Pin 7
 
-#define IODIR_ADDR 0x00
-#define GPIO_ADDR 0x09
-#define OLAT_ADDR 0x0A
+#define ADDR 0b0100000
+#define IODIR_ADDR _u(0x00)
+#define GPIO_ADDR _u(0x09)
+#define OLAT_ADDR _u(0x0A)
 
 void init_mcp23008()
 {
+    stdio_init_all();
+
+    printf("1\n");
+
     // initialize the MCP23008 with GP7 connected to an LED (write/output) and GP0 connected to a button (read/input)
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    // I2C Initialisation. Using it at 400Khz.
-    i2c_init(I2C_PORT, 400 * 1000);
+    printf("2\n");
+
+    // I2C Initialisation. Using it at 100Khz.
+    i2c_init(I2C_PORT, 100 * 1000);
 
     // Set GP0 as input, GP7 as output
     uint8_t buf[2];
     buf[0] = IODIR_ADDR;
-    buf[1] = 0 << 7 && 1 << 0;
-    i2c_write_blocking(i2c_default, GPIO_ADDR, buf, 2, false);
+    buf[1] = 0u << 7 || 1u << 0;
+    printf("3: %d\n", buf[1]);
+
+    i2c_write_blocking(I2C_PORT, ADDR, buf, 2, false);
+    printf("4\n");
 
     // Not using internal pull up
     // gpio_pull_up(I2C_SDA);
@@ -34,27 +44,27 @@ void init_mcp23008()
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
 }
 
-void write_mcp23008_gpio(int pin, bool state)
+void write_mcp23008_gpio(int pin, uint state)
 {
     uint8_t buf[2];
     buf[0] = GPIO_ADDR;
     buf[1] = state << pin;
-    i2c_write_blocking(i2c_default, GPIO_ADDR, buf, 2, false);
+    i2c_write_blocking(i2c_default, ADDR, buf, 2, false);
 }
 
 int main()
 {
     await_usb(0);
 
-    // init_mcp23008();
+    init_mcp23008();
 
-    // bool on = false;
-    // while (true)
-    // {
-    //     toggle_led(0);
-    //     printf("%d\n",on);
-    //     write_mcp23008_gpio(7, on);
-    //     on = !on;
-    //     sleep_ms(1000);
-    // }
+    int on = 0;
+    while (true)
+    {
+        toggle_led(0);
+        printf("%d\n",on);
+        write_mcp23008_gpio(7, on);
+        on = (on+1)%2;
+        sleep_ms(1000);
+    }
 }

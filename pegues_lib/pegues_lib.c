@@ -65,7 +65,7 @@ void await_usb(float await_seconds)
     toggle_led(-1);
 
     // SOS pattern to indicate connected
-    int blink_delay = 50;
+    int blink_delay = 25;
     for (int i = 0; i <= 3; i++)
     {
         toggle_led(1);
