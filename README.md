@@ -7,5 +7,7 @@ Miguel Pegues's ME433: Advanced Mechatronics repo
 
       https://github.com/user-attachments/assets/82b65c56-1862-4abd-a83e-c1883e856d33
 
-3. [ ] [3: I2D LED](https://github.com/ndm736/ME433_2026/wiki/HW3)
-     * [HW3 folder](./HW3/)
+3. [x] [3: I2D LED](https://github.com/ndm736/ME433_2026/wiki/HW3)
+    * [HW3 folder](./HW3/)
+
+    https://github.com/user-attachments/assets/880ef6e8-003c-4b67-80d8-324bf3797b06
