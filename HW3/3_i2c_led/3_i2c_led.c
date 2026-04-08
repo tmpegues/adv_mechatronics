@@ -4,7 +4,7 @@
 #include "../../pegues_lib/pegues_lib.h"
 
 // I2C defines
-// This example will use I2C0 on GPIO8 (SDA) and GPIO9 (SCL) running at 400KHz.
+// This example will use I2C0 on GPIO4 (SDA) and GPIO5 (SCL) running at 100KHz.
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
 #define I2C_PORT i2c_default
 #define I2C_SDA 4 // Pin 6
