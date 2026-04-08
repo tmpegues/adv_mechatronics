@@ -19,14 +19,14 @@ void init_mcp23008()
 {
     stdio_init_all();
 
-    // initialize the MCP23008 with GP7 connected to an LED (write/output) and GP0 connected to a button (read/input)
+
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
 
     // I2C Initialisation. Using it at 100Khz.
     i2c_init(I2C_PORT, 100 * 1000);
 
-    // Set GP0 as input, GP7 as output
+    // initialize the MCP23008 with GP7 connected to an LED (write/output/0) and GP0 connected to a button (read/input/1)
     uint8_t buf[2];
     buf[0] = IODIR_ADDR;
     buf[1] = 0u << 7 | 1u << 0;
@@ -51,7 +51,9 @@ bool read_mcp23008_gpio(int pin)
     uint8_t reg = GPIO_ADDR;
     i2c_write_blocking(i2c_default, ADDR, &reg, 1, true); // true to keep host control of bus
     i2c_read_blocking(i2c_default, ADDR, &buf, 1, false); // false - finished with bus
-    bool state = !(buf & 1u);
+    bool state = !(buf << pin & 1u);
+    // printf("All pins: %d\n", buf);
+    // printf("Pin state %d: %d\n", pin, state);
     return state;
 }
 
@@ -66,6 +68,6 @@ int main()
         toggle_led(0);
         bool state = read_mcp23008_gpio(0);
         write_mcp23008_gpio(7, state);
-        sleep_ms(25);
+        sleep_ms(25); // Using 25 so it's slow enough that you can see the built in LED blink
     }
 }
