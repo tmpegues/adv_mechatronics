@@ -19,12 +19,9 @@ void init_mcp23008()
 {
     stdio_init_all();
 
-    printf("1\n");
-
     // initialize the MCP23008 with GP7 connected to an LED (write/output) and GP0 connected to a button (read/input)
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    printf("2\n");
 
     // I2C Initialisation. Using it at 100Khz.
     i2c_init(I2C_PORT, 100 * 1000);
@@ -33,12 +30,9 @@ void init_mcp23008()
     uint8_t buf[2];
     buf[0] = IODIR_ADDR;
     buf[1] = 0u << 7 | 1u << 0;
-    printf("3: %d\n", buf[1]);
 
     i2c_write_blocking(I2C_PORT, ADDR, buf, 2, false);
-    printf("4\n");
 
-    // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
 }
 
 void write_mcp23008_gpio(int pin, uint state)
@@ -49,14 +43,15 @@ void write_mcp23008_gpio(int pin, uint state)
     i2c_write_blocking(I2C_PORT, ADDR, buf, 2, false);
 }
 
+
+// reading assumes pull up resistor
 bool read_mcp23008_gpio(int pin)
 {
     uint8_t buf;
     uint8_t reg = GPIO_ADDR;
     i2c_write_blocking(i2c_default, ADDR, &reg, 1, true); // true to keep host control of bus
     i2c_read_blocking(i2c_default, ADDR, &buf, 1, false); // false - finished with bus
-    bool state = buf & 1u;
-    printf("read pin %d: %d\n", pin, buf);
+    bool state = !(buf & 1u);
     return state;
 }
 
@@ -69,12 +64,8 @@ int main()
     while (true)
     {
         toggle_led(0);
-        // for (int i = 0; i <= 8; i++)
-        // {
-        //     read_mcp23008_gpio(i);
-        // }
         bool state = read_mcp23008_gpio(0);
         write_mcp23008_gpio(7, state);
-        sleep_ms(1000);
+        sleep_ms(25);
     }
 }
