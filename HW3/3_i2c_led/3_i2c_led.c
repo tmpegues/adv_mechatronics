@@ -19,7 +19,6 @@ void init_mcp23008()
 {
     stdio_init_all();
 
-
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
 
@@ -32,42 +31,48 @@ void init_mcp23008()
     buf[1] = 0u << 7 | 1u << 0;
 
     i2c_write_blocking(I2C_PORT, ADDR, buf, 2, false);
-
 }
 
-void write_mcp23008_gpio(int pin, uint state)
+// General I2C functions that we were recommended to write
+void setPin(uint8_t address, uint8_t reg, uint8_t value)
 {
-    uint8_t buf[2];
-    buf[0] = GPIO_ADDR;
-    buf[1] = state << pin;
-    i2c_write_blocking(I2C_PORT, ADDR, buf, 2, false);
+    uint8_t buf[2] = {reg, value};
+    i2c_write_blocking(I2C_PORT, address, buf, 2, false);
 }
 
-
-// reading assumes pull up resistor
-bool read_mcp23008_gpio(int pin)
+uint8_t readPin(uint8_t address, uint8_t reg)
 {
     uint8_t buf;
-    uint8_t reg = GPIO_ADDR;
     i2c_write_blocking(i2c_default, ADDR, &reg, 1, true); // true to keep host control of bus
     i2c_read_blocking(i2c_default, ADDR, &buf, 1, false); // false - finished with bus
-    bool state = !(buf << pin & 1u);
     // printf("All pins: %d\n", buf);
-    // printf("Pin state %d: %d\n", pin, state);
-    return state;
+    return buf;
+}
+
+
+// Specific MCP23008 functions using the above
+void write_mcp23008_gpio(int pin, uint state)
+{
+    setPin(ADDR, GPIO_ADDR, state << pin);
+}
+
+// Assumes pull up resistor
+bool read_mcp23008_gpio(int pin)
+{
+    bool pin_state = !(readPin(ADDR, GPIO_ADDR) << pin & 1u);
+    // printf("Pin, state %d: %d\n", pin, pin_state);
+    return pin_state;
 }
 
 int main()
 {
     await_usb(0);
-
     init_mcp23008();
 
     while (true)
     {
         toggle_led(0);
-        bool state = read_mcp23008_gpio(0);
-        write_mcp23008_gpio(7, state);
+        write_mcp23008_gpio(7, read_mcp23008_gpio(0));
         sleep_ms(25); // Using 25 so it's slow enough that you can see the built in LED blink
     }
 }
