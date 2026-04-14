@@ -45,11 +45,6 @@ void ssd1306_setup() {
 
 // send a command instruction (not pixel data)
 void ssd1306_command(unsigned char c) {
-    //i2c_master_start();
-    //i2c_master_send(ssd1306_write);
-    //i2c_master_send(0x00); // bit 7 is 0 for Co bit (data bytes only), bit 6 is 0 for DC (data is a command))
-    //i2c_master_send(c);
-    //i2c_master_stop();
 
     uint8_t buf[2];
     buf[0] = 0x00;
@@ -68,16 +63,6 @@ void ssd1306_update() {
 
     unsigned short count = 512; // WIDTH * ((HEIGHT + 7) / 8)
     unsigned char * ptr = ssd1306_buffer; // first address of the pixel buffer
-    /*
-    i2c_master_start();
-    i2c_master_send(ssd1306_write);
-    i2c_master_send(0x40); // send pixel data
-    // send every pixel
-    while (count--) {
-        i2c_master_send(*ptr++);
-    }
-    i2c_master_stop();
-    */
 
     i2c_write_blocking(i2c_default, SSD1306_ADDRESS, ptr, 513, false);
 }
