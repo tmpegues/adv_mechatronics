@@ -23,7 +23,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico2 CACHE STRING "Board type")
+set(PICO_BOARD pico2_w CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -35,9 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(4_oled   4_oled.c
-                        ssd1306/ssd1306.c
-                        ../../pegues_lib/pegues_lib.c)
+add_executable(4_oled 4_oled.c ../../pegues_lib/pegues_lib.c)
 
 pico_set_program_name(4_oled "4_oled")
 pico_set_program_version(4_oled "0.1")
@@ -48,12 +46,12 @@ pico_enable_stdio_usb(4_oled 1)
 
 # Add the standard library to the build
 target_link_libraries(4_oled
-        pico_stdlib
-        hardware_pwm)
+        pico_stdlib)
 
 if (PICO_CYW43_SUPPORTED)
     target_link_libraries(4_oled pico_cyw43_arch_none)
 endif()
+
 
 # Add the standard include files to the build
 target_include_directories(4_oled PRIVATE
@@ -62,7 +60,7 @@ target_include_directories(4_oled PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(4_oled
-        hardware_i2c
+
         )
 
 pico_add_extra_outputs(4_oled)
