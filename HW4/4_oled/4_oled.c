@@ -21,11 +21,11 @@ void init_oled()
 
 int main()
 {
-    await_usb(0);
+    await_usb(0, true);
     init_oled();
     while (true)
     {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+        breathe_led(-1);
+        sleep_ms(50);
     }
 }

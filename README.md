@@ -1,5 +1,7 @@
 Miguel Pegues's ME433: Advanced Mechatronics repo
 
+If code from a specific assignment stops working, it's most likely because I've updated pegues_lib without guaranteeing compatibility with existing code. Check out the last commit where that assignment was updated and it should work.
+
 # Assignments:
 1. [x] [1: Kitchen](https://github.com/ndm736/ME433_2026/wiki/HW1)
 2. [x] [2: Set up Pico and servo control in C and Python.](https://github.com/ndm736/ME433_2026/wiki/HW2)

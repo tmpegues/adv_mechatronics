@@ -17,6 +17,11 @@ void toggle_led(int state);
 
 // Waits for USB serial connection.
 // If await_seconds = 0, it will wait indefinitely
-void await_usb(float await_seconds);
+// After USB serial connection, create an interrupt that
+void await_usb(float await_seconds, bool breathe);
+
+// Use brightness 0 to 10 to set brightness (0 = off, 10 = full on)
+// Use brightness < 0 to auto-sweep through brightness
+void breathe_led(int brightness);
 
 #endif

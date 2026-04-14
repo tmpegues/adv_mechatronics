@@ -1,8 +1,14 @@
 #include "pegues_lib.h"
 
+
 #ifdef CYW43_WL_GPIO_LED_PIN
 #include "pico/cyw43_arch.h"
 #endif
+
+#define BREATHE_MAX 10
+
+int led_bright = 0;
+struct repeating_timer led_timer;
 
 // Turn the led on or off, I use it to know that the loop is running properly
 void toggle_led(int state)
@@ -44,7 +50,48 @@ int init_led()
 #endif
 }
 
-void await_usb(float await_seconds)
+void breathe_led(int brightness)
+{
+    static bool increase = true;
+    if (brightness < 0)
+    {
+        if (led_bright > BREATHE_MAX)
+        {
+            increase = false;
+        }
+        else if (led_bright < 0)
+        {
+            increase = true;
+        }
+
+        increase ? led_bright++ : led_bright--;
+    }
+    else
+    {
+        led_bright = brightness * BREATHE_MAX / 100;
+    }
+
+}
+
+bool breathe_timer_callback(__unused struct repeating_timer *t)
+{
+    static int i = 0;
+
+    i = (i < BREATHE_MAX) ? i+1 : 0;
+
+    if (i <= led_bright)
+    {
+        toggle_led(1);
+    }
+    else
+    {
+        toggle_led(-1);
+    }
+
+    return true;
+}
+
+void await_usb(float await_seconds, bool breathe)
 {
     stdio_init_all();
     int rc = init_led();
@@ -64,30 +111,38 @@ void await_usb(float await_seconds)
     }
     toggle_led(-1);
 
-    // SOS pattern to indicate connected
-    int blink_delay = 25;
-    for (int i = 0; i <= 3; i++)
+    // Create brightness timer interrupt
+    if (breathe)
     {
-        toggle_led(1);
-        sleep_ms(blink_delay);
-        toggle_led(-1);
-        sleep_ms(blink_delay);
+        add_repeating_timer_ms(-2, breathe_timer_callback, NULL, &led_timer);
     }
-    sleep_ms(blink_delay * 3);
-    for (int i = 0; i <= 3; i++)
+    else
     {
-        toggle_led(1);
+        // SOS pattern to indicate connected
+        int blink_delay = 25;
+        for (int i = 0; i <= 3; i++)
+        {
+            toggle_led(1);
+            sleep_ms(blink_delay);
+            toggle_led(-1);
+            sleep_ms(blink_delay);
+        }
         sleep_ms(blink_delay * 3);
-        toggle_led(-1);
-        sleep_ms(blink_delay);
-    }
-    sleep_ms(blink_delay * 3);
-    for (int i = 0; i <= 3; i++)
-    {
-        toggle_led(1);
-        sleep_ms(blink_delay);
-        toggle_led(-1);
-        sleep_ms(blink_delay);
+        for (int i = 0; i <= 3; i++)
+        {
+            toggle_led(1);
+            sleep_ms(blink_delay * 3);
+            toggle_led(-1);
+            sleep_ms(blink_delay);
+        }
+        sleep_ms(blink_delay * 3);
+        for (int i = 0; i <= 3; i++)
+        {
+            toggle_led(1);
+            sleep_ms(blink_delay);
+            toggle_led(-1);
+            sleep_ms(blink_delay);
+        }
     }
     printf("USB serial connected after %d loops\n", await_loop);
 }

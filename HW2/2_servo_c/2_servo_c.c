@@ -65,7 +65,7 @@ int main()
 {
     // stdio_init_all();
     // int rc = init_led();
-    await_usb(0);
+    await_usb(0, false);
     init_pwm();
 
     printf("Starting sweep\n");
