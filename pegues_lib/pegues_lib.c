@@ -1,14 +1,15 @@
 #include "pegues_lib.h"
 
-
 #ifdef CYW43_WL_GPIO_LED_PIN
 #include "pico/cyw43_arch.h"
 #endif
 
 #define BREATHE_MAX 10
+#define AWAIT_SLEEP 50
 
 int led_bright = 0;
 struct repeating_timer led_timer;
+bool breathe = false;
 
 // Turn the led on or off, I use it to know that the loop is running properly
 void toggle_led(int state)
@@ -52,32 +53,38 @@ int init_led()
 
 void breathe_led(int brightness)
 {
-    static bool increase = true;
-    if (brightness < 0)
+    if (breathe)
     {
-        if (led_bright > BREATHE_MAX)
+        static bool increase = true;
+        if (brightness <= 0)
         {
-            increase = false;
-        }
-        else if (led_bright < 0)
-        {
-            increase = true;
-        }
+            if (led_bright > BREATHE_MAX)
+            {
+                increase = false;
+            }
+            else if (led_bright < 0)
+            {
+                increase = true;
+            }
 
-        increase ? led_bright++ : led_bright--;
+            increase ? led_bright++ : led_bright--;
+        }
+        else
+        {
+            led_bright = brightness * BREATHE_MAX / 100;
+        }
     }
     else
     {
-        led_bright = brightness * BREATHE_MAX / 100;
+        toggle_led(brightness);
     }
-
 }
 
 bool breathe_timer_callback(__unused struct repeating_timer *t)
 {
     static int i = 0;
 
-    i = (i < BREATHE_MAX) ? i+1 : 0;
+    i = (i < BREATHE_MAX) ? i + 1 : 0;
 
     if (i <= led_bright)
     {
@@ -91,27 +98,28 @@ bool breathe_timer_callback(__unused struct repeating_timer *t)
     return true;
 }
 
-void await_usb(float await_seconds, bool breathe)
+void await_usb(float await_seconds, bool want_breathe)
 {
     stdio_init_all();
     int rc = init_led();
-    int await_sleep = 50;
+
     bool indefinite = false;
     if (await_seconds == 0)
     {
         indefinite = true;
     }
-    int max_loops = await_seconds * 1000.0 / await_sleep;
+    int max_loops = await_seconds * 1000.0 / AWAIT_SLEEP;
     int await_loop = 0;
     while (!stdio_usb_connected() && (indefinite || await_loop <= max_loops + 1))
     {
         toggle_led(0);
-        sleep_ms(await_sleep); // Blink fast while waiting
+        sleep_ms(AWAIT_SLEEP); // Blink fast while waiting
         await_loop++;
     }
     toggle_led(-1);
 
     // Create brightness timer interrupt
+    breathe = want_breathe;
     if (breathe)
     {
         add_repeating_timer_ms(-2, breathe_timer_callback, NULL, &led_timer);

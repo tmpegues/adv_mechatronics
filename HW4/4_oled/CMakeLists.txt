@@ -35,7 +35,9 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(4_oled 4_oled.c  ../../pegues_lib/pegues_lib.c)
+add_executable(4_oled   4_oled.c
+                        ssd1306/ssd1306.c
+                        ../../pegues_lib/pegues_lib.c)
 
 pico_set_program_name(4_oled "4_oled")
 pico_set_program_version(4_oled "0.1")
