@@ -9,24 +9,9 @@
 #define BREATHE_MAX 10
 #define AWAIT_SLEEP 50
 
-#define I2C_PORT i2c_default
-#define I2C_SDA 4 // Pin 6
-#define I2C_SCL 5 // Pin 7
-
 int led_bright = 0;
 struct repeating_timer led_timer;
 bool breathe = false;
-
-
-
-void init_i2c()
-{
-    stdio_init_all();
-    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-
-    i2c_init(I2C_PORT, 400 * 1000);
-}
 
 // Turn the led on or off, I use it to know that the loop is running properly
 void toggle_led(int state)

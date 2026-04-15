@@ -12,8 +12,6 @@
 // init built in LED
 int init_led();
 
-void init_i2c();
-
 // state -1 or 1 sets LED to off or on. state 0 toggles current state.
 void toggle_led(int state);
 

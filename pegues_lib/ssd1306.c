@@ -14,7 +14,7 @@
 
 unsigned char SSD1306_ADDRESS = 0b0111100; // 7bit i2c address of oled display
 unsigned char ssd1306_buffer[513];         // 128x32/8. Every bit is a pixel except first byte
-bool print_fps = false;
+bool print_fps = true;
 
 void ssd1306_setup(bool want_fps)
 {
@@ -171,7 +171,7 @@ void ssd1306_fps(void)
     static uint last_time = 0;
     static bool colon_on = true;
 
-    print_fps = true;
+    //print_fps = true;
     frame_count++;
     if (frame_count >= FPS_THRESH)
     {
