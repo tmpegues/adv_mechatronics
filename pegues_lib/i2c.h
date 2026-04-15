@@ -1,5 +1,7 @@
 #ifndef PEGUES_I2C
 #define PEGUES_I2C
+#include "pico/stdlib.h"
+#include "hardware/i2c.h"
 
 void init_i2c();
 
