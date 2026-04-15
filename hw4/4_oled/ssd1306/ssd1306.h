@@ -1,8 +1,6 @@
 #ifndef SSD1306_H__
 #define SSD1306_H__
 
-#include "pico/stdlib.h"
-
 // Based on the adafruit and sparkfun libraries
 #define SSD1306_MEMORYMODE 0x20
 #define SSD1306_COLUMNADDR 0x21
@@ -25,7 +23,7 @@
 #define SSD1306_SETSTARTLINE 0x40
 #define SSD1306_DEACTIVATE_SCROLL 0x2E ///< Stop scroll
 
-void ssd1306_setup(bool want_fps);
+void ssd1306_setup(void);
 void ssd1306_update(void);
 void ssd1306_clear(void);
 void ssd1306_fill(void);
@@ -37,7 +35,7 @@ void ssd1306_drawLetter(unsigned char x, unsigned char y, unsigned char characte
 // Draw a string with the upper left corner at x, y. I will attempt to wrap, but no guarantees.
 void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *character);
 
-// Draw the FPS in the lower left corner of the display
+// Draw the FPS in the lower left corner of the display. Only needs to be called once during setup in main code.
 void ssd1306_fps(void);
 
 /// this should be private

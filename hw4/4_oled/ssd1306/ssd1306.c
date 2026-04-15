@@ -7,15 +7,13 @@
 #include "hardware/i2c.h"
 #include "font.h"
 
-#define FPS_THRESH 10
+#define FPS_THRESH 5
 unsigned char SSD1306_ADDRESS = 0b0111100; // 7bit i2c address
 unsigned char ssd1306_buffer[513];         // 128x32/8. Every bit is a pixel except first byte
 bool print_fps = false;
 
-void ssd1306_setup(bool want_fps)
+void ssd1306_setup(void)
 {
-
-    print_fps = want_fps;
     // first byte in ssd1306_buffer is a command
     ssd1306_buffer[0] = 0x40;
     // give a little delay for the ssd1306 to power up
@@ -166,20 +164,16 @@ void ssd1306_fps(void)
     static unsigned char frame_count = 0;
     static uint last_time = 0;
 
+    print_fps = true;
     frame_count++;
     if (frame_count >= FPS_THRESH)
     {
         uint time = to_us_since_boot(get_absolute_time());
         uint fps = (frame_count*1000000) / (time - last_time); // Multiply frames by 1000000 because of microseconds
 
-        char message[50];
-        sprintf(message, "time: %u", time);
-        ssd1306_drawString(0, 16, message);
+        char message[9];
 
-        sprintf(message, "last: %u", last_time);
-        ssd1306_drawString(0, 8, message);
-
-        sprintf(message, "diff: %u, %u", (time - last_time), fps);
+        sprintf(message, "FPS: %3u", fps);
         ssd1306_drawString(0, 24, message);
 
         last_time = time;
