@@ -58,7 +58,7 @@ void breathe_led(int brightness)
         static bool increase = true;
         if (brightness <= 0)
         {
-            if (led_bright > BREATHE_MAX)
+            if (led_bright > BREATHE_MAX/2)
             {
                 increase = false;
             }
