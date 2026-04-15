@@ -15,8 +15,7 @@ void init_oled()
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
 
-    // I2C Initialisation. Using it at 100Khz.
-    i2c_init(I2C_PORT, 100 * 1000);
+    i2c_init(I2C_PORT, 400 * 1000);
 
     ssd1306_setup();
     printf("SSD1306 display setup complete\n");
