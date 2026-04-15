@@ -20,6 +20,8 @@ int main()
 
     while (true)
     {
+        read_all();
+        printf("Acc x, y, z: %1.2f, %1.2f, %1.2f", acc_x(), acc_y(), acc_z());
         ssd1306_update();
     }
 }
