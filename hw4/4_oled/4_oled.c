@@ -26,8 +26,11 @@ int main()
 {
     await_usb(0, true);
     init_oled();
-    ssd1306_fill();
-    ssd1306_drawLetter(0, 0, 'b');
+
+    int i = 15;
+    char message[50];
+    sprintf(message, "my var = %d", i);
+    ssd1306_drawString(20, 10, message); // draw starting at x=20,y=10
 
     while (true)
     {
@@ -36,12 +39,12 @@ int main()
         ssd1306_drawPixel(127, 31, 1);
 
         ssd1306_update();
-        sleep_ms(100);
+        sleep_ms(1000);
 
         breathe_led(0);
         ssd1306_drawPixel(0, 0, 0);
         ssd1306_drawPixel(127, 31, 0);
         ssd1306_update();
-        sleep_ms(100);
+        sleep_ms(1000);
     }
 }

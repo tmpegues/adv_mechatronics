@@ -32,6 +32,10 @@ void ssd1306_drawPixel(unsigned char x, unsigned char y, unsigned char color);
 // Draw a character with the upper left corner at x, y
 void ssd1306_drawLetter(unsigned char x, unsigned char y, unsigned char character);
 
+// Draw a string with the upper left corner at x, y. I will attempt to wrap, but no guarantees.
+void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *character);
+
+
 /// this should be private
 void ssd1306_command(unsigned char c);
 

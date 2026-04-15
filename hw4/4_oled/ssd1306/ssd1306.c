@@ -94,14 +94,44 @@ void ssd1306_drawLetter(unsigned char x_or, unsigned char y_or, unsigned char ch
     // Using a basic loop for now to make sure I understand the structure correctly
     character -= 0x20;
 
-    for (int x = 0; x < 5; x++)
+    for (int x = 0; x <= 4; x++)
     {
         char col = ASCII[character][x];
-        for (int y = 0; y < 8; y++)
+        for (int y = 0; y <= 7; y++)
         {
             bool pin_on = ((col >> y) & 1);
             ssd1306_drawPixel(x_or + x, y_or + y, pin_on);
         }
+    }
+}
+
+void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *character)
+{
+    int i = 0;
+    int x = 0;
+    int y = 0;
+    while (true)
+    {
+        char letter = character[i];
+        if (letter == 0)
+        {
+            break;
+        }
+        else
+        {
+            ssd1306_drawLetter(x_or + x, y_or + y, letter);
+            x += 5;
+            if (x_or + x > 122)
+            {
+                x = 0;
+                y += 8;
+            }
+            if (y_or + y > 23)
+            {
+                break;
+            }
+        }
+        i++;
     }
 }
 
