@@ -153,20 +153,14 @@ void ssd1306_fill()
     }
 }
 
-// 01111111  H
-// 00001000
-// 00001000
-// 00001000
-// 01111111
+void ssd1306_fps(void)
+{
+    static uint last_time = 0;
+    uint time = to_us_since_boot(get_absolute_time());
 
-// 00110010  @
-// 01001001
-// 01111001
-// 01000001
-// 00111110
-
-// 00100000  J
-// 01000000
-// 01000001
-// 00111111
-// 00000001
+    int fps = 1/((time - last_time)/1000000.0);
+    char message[5];
+    sprintf(message, "FPS: %d", (time - last_time) / 1000000.0);
+    ssd1306_drawString(0, 23, message);
+    last_time = time;
+}

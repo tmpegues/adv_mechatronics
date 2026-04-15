@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
+#include "hardware/adc.h"
 
 #include "../../pegues_lib/pegues_lib.h"
 #include "ssd1306/ssd1306.h"
@@ -25,25 +26,20 @@ int main()
 {
     await_usb(0, true);
     init_oled();
-
+    adc_init();
+    adc_select_input(0);
     int i = 15;
     char message[50];
-    sprintf(message, "my var = %d", i);
-    ssd1306_drawString(20, 10, message); // draw starting at x=20,y=10
 
     while (true)
     {
         breathe_led(0);
-        ssd1306_drawPixel(0, 0, 1);
-        ssd1306_drawPixel(127, 31, 1);
 
+        sprintf(message, "ADC0 = %1.2f", adc_read()/4095.0*3.3);
+        ssd1306_drawString(0, 0, message);
+        ssd1306_fps();
         ssd1306_update();
-        sleep_ms(1000);
-
-        breathe_led(0);
-        ssd1306_drawPixel(0, 0, 0);
-        ssd1306_drawPixel(127, 31, 0);
-        ssd1306_update();
+        i++;
         sleep_ms(1000);
     }
 }

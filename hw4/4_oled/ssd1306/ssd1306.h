@@ -35,6 +35,8 @@ void ssd1306_drawLetter(unsigned char x, unsigned char y, unsigned char characte
 // Draw a string with the upper left corner at x, y. I will attempt to wrap, but no guarantees.
 void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *character);
 
+// Draw the FPS in the lower left corner of the display
+void ssd1306_fps(void);
 
 /// this should be private
 void ssd1306_command(unsigned char c);
