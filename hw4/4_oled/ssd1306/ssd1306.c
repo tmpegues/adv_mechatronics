@@ -1,6 +1,8 @@
 // based on adafruit and sparkfun libraries
 
 #include <string.h> // for memset
+#include <stdio.h>
+
 #include "ssd1306.h"
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
@@ -11,6 +13,7 @@ unsigned char ssd1306_buffer[513];         // 128x32/8. Every bit is a pixel exc
 
 void ssd1306_setup()
 {
+
     // first byte in ssd1306_buffer is a command
     ssd1306_buffer[0] = 0x40;
     // give a little delay for the ssd1306 to power up
@@ -84,19 +87,25 @@ void ssd1306_drawPixel(unsigned char x, unsigned char y, unsigned char color)
     {
         ssd1306_buffer[1 + x + (y / 8) * 128] &= ~(1 << (y & 7));
     }
+
 }
 
 void ssd1306_drawLetter(unsigned char x_or, unsigned char y_or, unsigned char character)
 {
     // Using a basic loop for now to make sure I understand the structure correctly
+    printf("ASCII: %d\n", character);
     character -= 0x20;
+    printf("ASCII: %d\n", character);
+
     for (int x = 0; x < 5; x++)
     {
         char col = ASCII[character][x];
+        printf("col: %x\n", col);
         for (int y = 0; y < 8; y++)
         {
-            bool pin_on = (col << y & 1);
-            ssd1306_drawPixel(x_or, y_or - y, pin_on);
+            bool pin_on = ((col >> y) & 1);
+            ssd1306_drawPixel(x_or + x, y_or - y, pin_on);
+            printf("x, y, on: %d, %d, %d\n", x_or + x, y_or - y, pin_on);
         }
     }
 
