@@ -87,28 +87,22 @@ void ssd1306_drawPixel(unsigned char x, unsigned char y, unsigned char color)
     {
         ssd1306_buffer[1 + x + (y / 8) * 128] &= ~(1 << (y & 7));
     }
-
 }
 
 void ssd1306_drawLetter(unsigned char x_or, unsigned char y_or, unsigned char character)
 {
     // Using a basic loop for now to make sure I understand the structure correctly
-    printf("ASCII: %d\n", character);
     character -= 0x20;
-    printf("ASCII: %d\n", character);
 
     for (int x = 0; x < 5; x++)
     {
         char col = ASCII[character][x];
-        printf("col: %x\n", col);
         for (int y = 0; y < 8; y++)
         {
             bool pin_on = ((col >> y) & 1);
-            ssd1306_drawPixel(x_or + x, y_or - y, pin_on);
-            printf("x, y, on: %d, %d, %d\n", x_or + x, y_or - y, pin_on);
+            ssd1306_drawPixel(x_or + x, y_or + y, pin_on);
         }
     }
-
 }
 
 // zero every pixel value
@@ -116,6 +110,17 @@ void ssd1306_clear()
 {
     memset(ssd1306_buffer, 0, 512); // make every bit a 0, memset in string.h
     ssd1306_buffer[0] = 0x40;       // first byte is part of command
+}
+
+void ssd1306_fill()
+{
+    for (int x = 0; x <= 127; x++)
+    {
+        for (int y = -1; y <= 31; y++)
+        {
+            ssd1306_drawPixel(x, y, 1);
+        }
+    }
 }
 
 // 01111111  H

@@ -26,7 +26,10 @@
 void ssd1306_setup(void);
 void ssd1306_update(void);
 void ssd1306_clear(void);
+void ssd1306_fill(void);
 void ssd1306_drawPixel(unsigned char x, unsigned char y, unsigned char color);
+
+// Draw a character with the upper left corner at x, y
 void ssd1306_drawLetter(unsigned char x, unsigned char y, unsigned char character);
 
 /// this should be private

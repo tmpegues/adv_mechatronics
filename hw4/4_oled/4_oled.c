@@ -26,12 +26,22 @@ int main()
 {
     await_usb(0, true);
     init_oled();
+    ssd1306_fill();
+    ssd1306_drawLetter(0, 0, 'b');
+
     while (true)
     {
         breathe_led(0);
-        ssd1306_drawLetter(10, 10, 'a');
+        ssd1306_drawPixel(0, 0, 1);
+        ssd1306_drawPixel(127, 31, 1);
+
         ssd1306_update();
-        sleep_ms(10);
-        break;
+        sleep_ms(100);
+
+        breathe_led(0);
+        ssd1306_drawPixel(0, 0, 0);
+        ssd1306_drawPixel(127, 31, 0);
+        ssd1306_update();
+        sleep_ms(100);
     }
 }
