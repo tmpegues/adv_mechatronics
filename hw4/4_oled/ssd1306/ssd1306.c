@@ -5,15 +5,17 @@
 
 #include "ssd1306.h"
 #include "hardware/i2c.h"
-#include "pico/stdlib.h"
 #include "font.h"
 
+#define FPS_THRESH 10
 unsigned char SSD1306_ADDRESS = 0b0111100; // 7bit i2c address
 unsigned char ssd1306_buffer[513];         // 128x32/8. Every bit is a pixel except first byte
+bool print_fps = false;
 
-void ssd1306_setup()
+void ssd1306_setup(bool want_fps)
 {
 
+    print_fps = want_fps;
     // first byte in ssd1306_buffer is a command
     ssd1306_buffer[0] = 0x40;
     // give a little delay for the ssd1306 to power up
@@ -67,6 +69,11 @@ void ssd1306_update()
 
     unsigned short count = 512;          // WIDTH * ((HEIGHT + 7) / 8)
     unsigned char *ptr = ssd1306_buffer; // first address of the pixel buffer
+
+    if (print_fps)
+    {
+        ssd1306_fps();
+    }
 
     i2c_write_blocking(i2c_default, SSD1306_ADDRESS, ptr, 513, false);
 }
@@ -123,13 +130,14 @@ void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *c
             x += 5;
             if (x_or + x > 122)
             {
+                if (y_or + y > 23)
+                {
+                    break;
+                }
                 x = 0;
                 y += 8;
             }
-            if (y_or + y > 23)
-            {
-                break;
-            }
+
         }
         i++;
     }
@@ -155,12 +163,28 @@ void ssd1306_fill()
 
 void ssd1306_fps(void)
 {
+    static unsigned char frame_count = 0;
     static uint last_time = 0;
-    uint time = to_us_since_boot(get_absolute_time());
 
-    int fps = 1/((time - last_time)/1000000.0);
-    char message[5];
-    sprintf(message, "FPS: %d", (time - last_time) / 1000000.0);
-    ssd1306_drawString(0, 23, message);
-    last_time = time;
+    frame_count++;
+    if (frame_count >= FPS_THRESH)
+    {
+        uint time = to_us_since_boot(get_absolute_time());
+        uint fps = (frame_count*1000000) / (time - last_time); // Multiply frames by 1000000 because of microseconds
+
+        char message[50];
+        sprintf(message, "time: %u", time);
+        ssd1306_drawString(0, 16, message);
+
+        sprintf(message, "last: %u", last_time);
+        ssd1306_drawString(0, 8, message);
+
+        sprintf(message, "diff: %u, %u", (time - last_time), fps);
+        ssd1306_drawString(0, 24, message);
+
+        last_time = time;
+        frame_count = 0;
+    }
+
+
 }

@@ -1,6 +1,8 @@
 #ifndef SSD1306_H__
 #define SSD1306_H__
 
+#include "pico/stdlib.h"
+
 // Based on the adafruit and sparkfun libraries
 #define SSD1306_MEMORYMODE 0x20
 #define SSD1306_COLUMNADDR 0x21
@@ -23,7 +25,7 @@
 #define SSD1306_SETSTARTLINE 0x40
 #define SSD1306_DEACTIVATE_SCROLL 0x2E ///< Stop scroll
 
-void ssd1306_setup(void);
+void ssd1306_setup(bool want_fps);
 void ssd1306_update(void);
 void ssd1306_clear(void);
 void ssd1306_fill(void);

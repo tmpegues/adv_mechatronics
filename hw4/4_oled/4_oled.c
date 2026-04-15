@@ -18,7 +18,7 @@ void init_oled()
 
     i2c_init(I2C_PORT, 400 * 1000);
 
-    ssd1306_setup();
+    ssd1306_setup(true);
     printf("SSD1306 display setup complete\n");
 }
 
@@ -35,11 +35,11 @@ int main()
     {
         breathe_led(0);
 
-        sprintf(message, "ADC0 = %1.2f", adc_read()/4095.0*3.3);
+        sprintf(message, "ADC0 = %d", i++);
         ssd1306_drawString(0, 0, message);
         ssd1306_fps();
         ssd1306_update();
         i++;
-        sleep_ms(1000);
+        // sleep_ms(10);
     }
 }
