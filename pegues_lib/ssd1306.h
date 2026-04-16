@@ -41,4 +41,10 @@ void ssd1306_fps(void);
 /// this should be private
 void ssd1306_command(unsigned char c);
 
+// Draw axes from the center of the screen
+void draw_axes(int x, int y, int z);
+
+// Draw a vector from the center of the screen
+void draw_vector(int x, int y, int z);
+
 #endif

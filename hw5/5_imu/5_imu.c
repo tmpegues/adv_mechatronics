@@ -38,33 +38,10 @@ int main()
 
         // ssd1306 is 128 x 32
         ssd1306_clear();
-
-        // Draw x and y lines
-        // Multiply by 1/2 of screen dimension to scale 1g to screen size
-        // Add 1/2 of screen dimension to center the line
-        int x_length = -1 * acc_x() * 64;
-        int y_length = acc_y() * 64;
-        int i = 0;
-        while (-64 <= i && i <= 128)
-        {
-            if ((x_length <= i && i <= 0) || (0 <= i && i <= x_length))
-            {
-                ssd1306_drawPixel(64 + i, 15, 1);
-                ssd1306_drawPixel(64 + i, 16, 1);
-            }
-            (x_length >= 0) ? i++ : i--;
-        }
-
-        i = 0;
-        while (-32 <= i && i <= 32)
-        {
-            if ((y_length <= i && i <= 0) || (0 <= i && i <= y_length))
-            {
-                ssd1306_drawPixel(63, 16 + i, 1);
-                ssd1306_drawPixel(64, 16 + i, 1);
-            }
-            (y_length >= 0) ? i++ : i--;
-        }
+        int ax = -1 * acc_x() * 64;
+        int ay = acc_y() * 64;
+        draw_axes(ax, ay, 0);
+        draw_vector(ax, ay, 0);
 
         ssd1306_update();
         // sleep_ms(100);

@@ -2,6 +2,7 @@
 
 #include <string.h> // for memset
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "ssd1306.h"
 #include "hardware/i2c.h"
@@ -170,9 +171,9 @@ void ssd1306_fps(void)
     static unsigned char frame_count = 0;
     static uint last_time = 0;
     static bool colon_on = true;
-    static char message[9];
+    static char message[3];
 
-    //print_fps = true;
+    // print_fps = true;
     frame_count++;
     if (frame_count >= FPS_THRESH)
     {
@@ -181,11 +182,11 @@ void ssd1306_fps(void)
 
         if (colon_on)
         {
-            sprintf(message, "FPS: %3u", fps);
+            sprintf(message, "%3u", fps);
         }
         else
         {
-            sprintf(message, "FPS  %3u", fps);
+            sprintf(message, "%3u", fps);
         }
 
         last_time = time;
@@ -193,4 +194,54 @@ void ssd1306_fps(void)
         colon_on = !colon_on;
     }
     ssd1306_drawString(0, 24, message);
+}
+
+void draw_axes(int x, int y, int z)
+{
+    // Draw x and y lines
+    // Multiply by 1/2 of screen dimension to scale 1g to screen size
+    // Add 1/2 of screen dimension to center the line
+    int i = 0;
+    while (-64 <= i && i <= 64)
+    {
+        if ((x <= i && i <= 0) || (0 <= i && i <= x))
+        {
+            ssd1306_drawPixel(64 + i, 15, 1);
+            ssd1306_drawPixel(64 + i, 16, 1);
+        }
+        (x >= 0) ? i++ : i--;
+    }
+
+    i = 0;
+    while (-32 <= i && i <= 32)
+    {
+        if ((y <= i && i <= 0) || (0 <= i && i <= y))
+        {
+            ssd1306_drawPixel(63, 16 + i, 1);
+            ssd1306_drawPixel(64, 16 + i, 1);
+        }
+        (y >= 0) ? i++ : i--;
+    }
+}
+
+void draw_vector(int x, int y, int z)
+{
+    // x, y, z are the endpoints of the vector.
+    printf("%+d %+d %+d\n", x, y, z);
+    int i = 0;
+    if (abs(x) >= abs(y))
+    {
+        while (abs(i) <= 5)
+        {
+            int x_px = 63 + x / 5 * i;
+            int y_px = 16 + y / 5 * i;
+            printf("%d: %d, %d\n", i, x_px, y_px);
+            ssd1306_drawPixel(x_px, y_px, 1);
+            (x >= 0) ? i++ : i--;
+        }
+    }
+    else
+    {
+        ;
+    }
 }
