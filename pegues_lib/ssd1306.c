@@ -170,6 +170,7 @@ void ssd1306_fps(void)
     static unsigned char frame_count = 0;
     static uint last_time = 0;
     static bool colon_on = true;
+    static char message[9];
 
     //print_fps = true;
     frame_count++;
@@ -178,7 +179,6 @@ void ssd1306_fps(void)
         uint time = to_us_since_boot(get_absolute_time());
         uint fps = (frame_count * 1000000) / (time - last_time); // Multiply frames by 1000000 because of microseconds
 
-        char message[9];
         if (colon_on)
         {
             sprintf(message, "FPS: %3u", fps);
@@ -187,10 +187,10 @@ void ssd1306_fps(void)
         {
             sprintf(message, "FPS  %3u", fps);
         }
-        ssd1306_drawString(0, 24, message);
 
         last_time = time;
         frame_count = 0;
         colon_on = !colon_on;
     }
+    ssd1306_drawString(0, 24, message);
 }

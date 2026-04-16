@@ -28,6 +28,9 @@
 #define GYRO_ZOUT_L 0x48
 #define WHO_AM_I 0x75
 
+#define ACCEL_CONV 0.000061
+#define GYRO_CONV 0.007630
+
 int16_t ACC_X = 0;
 int16_t ACC_Y = 0;
 int16_t ACC_Z = 0;
@@ -80,28 +83,28 @@ void read_all(void)
 
 float acc_x(void)
 {
-    return ACC_X * 0.000061;
+    return ACC_X * ACCEL_CONV;
 }
 float acc_y(void)
 {
-    return ACC_Y * 0.000061;
+    return ACC_Y * ACCEL_CONV;
 }
 float acc_z(void)
 {
-    return ACC_Z * 0.000061;
+    return ACC_Z * ACCEL_CONV;
 }
 
 float gyr_x(void)
 {
-    return GYR_X * 0.007630;
+    return GYR_X * GYRO_CONV;
 }
 
 float gyr_y(void)
 {
-    return GYR_Y * 0.007630;
+    return GYR_Y * GYRO_CONV;
 }
 
 float gyr_z(void)
 {
-    return GYR_Z * 0.007630;
+    return GYR_Z * GYRO_CONV;
 }
