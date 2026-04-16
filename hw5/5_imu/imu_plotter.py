@@ -8,7 +8,6 @@ def get_line() -> str:
     Get serial line from serial.
 
     """
-    print('<--')
     return ser.readline().decode('utf-8').strip()
 
 
@@ -50,8 +49,22 @@ while len(ax) < 200:
         x, y, z = list(map(float, get_line().split()))
         gx.append(x)
         gy.append(y)
-        gz.append(x)
+        gz.append(z)
 
-plt.plot(ax, label = "Ax")
-plt.legend()
+fig, (ax1, ax2) = plt.subplots(1,2)
+
+
+ax1.plot(ax, label = "Ax")
+ax1.plot(ay, label = "Ay")
+ax1.plot(az, label = "Az")
+ax1.legend()
+ax1.set_title('Accel')
+
+ax2.plot(gx, label = "Gx")
+ax2.plot(gy, label = "Gy")
+ax2.plot(gz, label = "Gz")
+ax2.legend()
+ax2.set_title("Gyro")
+
+
 plt.show()
