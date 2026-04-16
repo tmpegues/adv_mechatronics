@@ -42,12 +42,8 @@ int main()
         // Draw x and y lines
         // Multiply by 1/2 of screen dimension to scale 1g to screen size
         // Add 1/2 of screen dimension to center the line
-        float ax = acc_x();
-        printf("%f\n", ax);
-        int x_length = -1 * ax * 64;
-        printf("%d\n", x_length);
-
-        int y_length = acc_y() * 16;
+        int x_length = -1 * acc_x() * 64;
+        int y_length = acc_y() * 64;
         int i = 0;
         while (-64 <= i && i <= 128)
         {
@@ -59,10 +55,15 @@ int main()
             (x_length >= 0) ? i++ : i--;
         }
 
-        for (int i = 0; i <= 32; i++)
+        i = 0;
+        while (-32 <= i && i <= 32)
         {
-            ssd1306_drawPixel(63, i-1, 1);
-            ssd1306_drawPixel(64, i-1, 1);
+            if ((y_length <= i && i <= 0) || (0 <= i && i <= y_length))
+            {
+                ssd1306_drawPixel(63, 16 + i, 1);
+                ssd1306_drawPixel(64, 16 + i, 1);
+            }
+            (y_length >= 0) ? i++ : i--;
         }
 
         ssd1306_update();
