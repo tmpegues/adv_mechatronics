@@ -12,7 +12,7 @@
 #define PWR_MGMT_1 0x6B
 #define PWR_MGMT_2 0x6C
 // sensor data registers:
-#define ACCEL_XOUT_H 0x3B
+#define ACCEL_XOUT_H _u(0x3B)
 #define ACCEL_XOUT_L 0x3C
 #define ACCEL_YOUT_H 0x3D
 #define ACCEL_YOUT_L 0x3E
@@ -64,31 +64,19 @@ bool init_imu(void)
 
 void read_all(void)
 {
-    printf("reading all\n");
-    unsigned char all_data = read_i2c(ADDR, ACCEL_XOUT_H, 14);
+    uint8_t reg = ACCEL_XOUT_H;
+    uint8_t all_data[14];
+    i2c_write_blocking(i2c_default, ADDR, &reg, 1, true);
+    i2c_read_blocking(i2c_default, ADDR, all_data, 14, false);
 
-    // uint8_t all_data[14];
-    // i2c_write_blocking(i2c_default, ADDR, ACCEL_XOUT_H, 1, true);      // true to keep host control of bus
-    // i2c_read_blocking(i2c_default, ADDR, &all_data, 14, false);        // false - finished with bus
-
-    printf("read all\n");
-
-    // ACC_X = all_data & 0b1111111111111111;
-    // all_data >> 16;
-    // ACC_Y = all_data & 0b1111111111111111;
-    // all_data >> 16;
-    // ACC_Z = all_data & 0b1111111111111111;
-    // all_data >> 16;
-    // TEMP = all_data & 0b1111111111111111;
-    // all_data >> 16;
-    // GYR_X = all_data & 0b1111111111111111;
-    // all_data >> 16;
-    // GYR_Y = all_data & 0b1111111111111111;
-    // all_data >> 16;
-    // GYR_Z = all_data & 0b1111111111111111;
+    ACC_X = all_data[0] | all_data[1] << 8;
+    ACC_Y = all_data[2] | all_data[3] << 8;
+    ACC_Z = all_data[4] | all_data[5] << 8;
+    TEMP = all_data[6] | all_data[7] << 8;
+    GYR_X = all_data[8] | all_data[9] << 8;
+    GYR_Y = all_data[10] | all_data[11] << 8;
+    GYR_Z = all_data[12] | all_data[13] << 8;
 }
-
-
 
 float acc_x(void)
 {
