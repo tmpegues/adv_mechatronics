@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "imu_lib.h"
-#include "../../pegues_lib/i2c.h"
+#include "i2c.h"
 
 #define ADDR 0b1101000
 

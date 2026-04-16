@@ -44,7 +44,7 @@ void ssd1306_command(unsigned char c);
 // Draw axes from the center of the screen
 void draw_axes(int x, int y, int z);
 
-// Draw a vector from the center of the screen
-void draw_vector(int x, int y, int z);
+// Draw a unit vector from the center of the screen. A component == 1 will send the vector 64 pixels.
+void draw_vector(float x, float y, float z);
 
 #endif

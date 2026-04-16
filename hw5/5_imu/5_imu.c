@@ -4,7 +4,7 @@
 #include "../../pegues_lib/pegues_lib.h"
 #include "../../pegues_lib/i2c.h"
 #include "../../pegues_lib/ssd1306.h"
-#include "imu_lib/imu_lib.h"
+#include "../../pegues_lib/imu_lib.h"
 
 int main()
 {
@@ -32,17 +32,17 @@ int main()
         float ax = acc_x();
         float ay = acc_y();
         float az = acc_z();
-        // printf("A\n%+2.2f %+2.2f %+2.2f\n", acc_x(), acc_y(), acc_z());
-        // printf("G\n%+2.2f %+2.2f %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
+        printf("A\n%+2.2f %+2.2f %+2.2f\n", ax, ay, az);
+        printf("G\n%+2.2f %+2.2f %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
 
         // ssd1306 is 128 x 32
         ssd1306_clear();
         // acc_x - is board tilted to the right
         // acc_y + is board standing up on flat end
         // acc_z + is board flat
-        ax *= -64;
-        ay *= 64;
-        az *= 64; // It isn't actually necessary to scale z, but it gets cast to an int
+        // ax *= -64;
+        // ay *= 64;
+        // az *= 64; // It isn't actually necessary to scale z, but it gets cast to an int
         // draw_axes(ax, ay, az);
         draw_vector(ax, ay, az);
 

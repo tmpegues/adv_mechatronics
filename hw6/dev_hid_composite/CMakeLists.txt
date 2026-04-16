@@ -38,7 +38,9 @@ pico_sdk_init()
 cmake_minimum_required(VERSION 3.13)
 
 add_executable(dev_hid_composite main.c
-                                 ../../pegues_lib/imu_lib.c)
+                                 ../../pegues_lib/imu_lib.c
+                                 ../../pegues_lib/i2c.c
+                                 ../../pegues_lib/ssd1306.c)
 
 target_sources(dev_hid_composite PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/main.c
@@ -57,7 +59,8 @@ target_link_libraries(dev_hid_composite
                         pico_unique_id
                         tinyusb_device
                         tinyusb_board
-                        hardware_i2c)
+                        hardware_i2c
+                    )
 
 # Uncomment this line to enable fix for Errata RP2040-E5 (the fix requires use of GPIO 15)
 #target_compile_definitions(dev_hid_composite PUBLIC PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1)

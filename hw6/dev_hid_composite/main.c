@@ -33,6 +33,8 @@
 #include "usb_descriptors.h"
 
 #include "../../pegues_lib/imu_lib.h"
+#include "../../pegues_lib/i2c.h"
+#include "../../pegues_lib/ssd1306.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -55,10 +57,18 @@ static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 void led_blinking_task(void);
 void hid_task(void);
 
+
+
+
+
+
 /*------------- MAIN -------------*/
 int main(void)
 {
   board_init();
+  init_i2c();
+  ssd1306_setup(true);
+  init_imu();
 
   // init device stack on configured roothub port
   tud_init(BOARD_TUD_RHPORT);
@@ -74,6 +84,7 @@ int main(void)
     led_blinking_task();
 
     hid_task();
+    ssd1306_update();
   }
 }
 
@@ -146,9 +157,12 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
   case REPORT_ID_MOUSE:
   {
     int8_t const delta = 5;
+    read_all();
+    int8_t dx = acc_x() * acc_x() * 10.0;
+    int8_t dy = acc_y() * acc_y() * 10.0;
 
-    // no button, right + down, no scroll, no pan
-    tud_hid_mouse_report(REPORT_ID_MOUSE, 0x00, delta, delta, 0, 0);
+
+    tud_hid_mouse_report(REPORT_ID_MOUSE, 0x00, dx, dy, 0, 0);
   }
   break;
 

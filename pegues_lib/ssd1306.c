@@ -224,8 +224,11 @@ void draw_axes(int x, int y, int z)
     }
 }
 
-void draw_vector(int x, int y, int z)
+void draw_vector(float x, float y, float z)
 {
+    x *= -64;
+    y *= 64;
+
     // x, y, z are the endpoints of the vector.
     for (int i = 0; i < 10; i++)
     {

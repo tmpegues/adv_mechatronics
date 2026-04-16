@@ -39,7 +39,7 @@ add_executable(5_imu 5_imu.c
                      ../../pegues_lib/pegues_lib.c
                      ../../pegues_lib/ssd1306.c
                      ../../pegues_lib/i2c.c
-                     imu_lib/imu_lib.c)
+                     ../../pegues_lib/imu_lib.c)
 
 pico_set_program_name(5_imu "5_imu")
 pico_set_program_version(5_imu "0.1")
