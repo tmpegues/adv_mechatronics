@@ -46,7 +46,7 @@ bool init_imu(void)
 
     // Check correct by reading from WHO_AM_I
     unsigned char who = read_i2c(ADDR, WHO_AM_I, 1);
-    if (who != 0x68)
+    if (who != ADDR)
     {
         return false;
     }
@@ -69,13 +69,13 @@ void read_all(void)
     i2c_write_blocking(i2c_default, ADDR, &reg, 1, true);
     i2c_read_blocking(i2c_default, ADDR, all_data, 14, false);
 
-    ACC_X = all_data[0] | all_data[1] << 8;
-    ACC_Y = all_data[2] | all_data[3] << 8;
-    ACC_Z = all_data[4] | all_data[5] << 8;
-    TEMP = all_data[6] | all_data[7] << 8;
-    GYR_X = all_data[8] | all_data[9] << 8;
-    GYR_Y = all_data[10] | all_data[11] << 8;
-    GYR_Z = all_data[12] | all_data[13] << 8;
+    ACC_X = all_data[0] << 8| all_data[1];
+    ACC_Y = all_data[2] << 8 | all_data[3];
+    ACC_Z = all_data[4] << 8 | all_data[5];
+    TEMP = all_data[6] << 8 | all_data[7];
+    GYR_X = all_data[8] << 8 | all_data[9];
+    GYR_Y = all_data[10] << 8 | all_data[11];
+    GYR_Z = all_data[12] << 8 | all_data[13];
 }
 
 float acc_x(void)

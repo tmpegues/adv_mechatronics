@@ -17,14 +17,21 @@ int main()
     }
     printf("IMU setup complete\n");
     ssd1306_setup(true);
-
+    printf("Sending\n\n"); // Indicates to the python plotter that data will start being sent
+    sleep_ms(100);
     while (true)
     {
         read_all();
-        // printf("Acc x, y, z: %+2.2f, %+2.2f, %+2.2f\n", acc_x(), acc_y(), acc_z());
-        printf("Gyr x, y, z: %+2.2f, %+2.2f, %+2.2f\n", acc_x(), acc_y(), acc_z());
+        char message[30];
+
+        sprintf(message, "A: %+2.2f, %+2.2f, %+2.2f\n", acc_x(), acc_y(), acc_z());
+        ssd1306_drawString(0, 0, message);
+        sprintf(message, "G: %+2.2f, %+2.2f, %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
+        ssd1306_drawString(0, 8, message);
+        printf("A\n%+2.2f %+2.2f %+2.2f\n", acc_x(), acc_y(), acc_z());
+        printf("G\n%+2.2f %+2.2f %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
 
         ssd1306_update();
-        sleep_ms(100);
+        // sleep_ms(100);
     }
 }
