@@ -23,6 +23,8 @@
  *
  */
 
+#define SCALE 50
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -57,11 +59,6 @@ static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 void led_blinking_task(void);
 void hid_task(void);
 
-
-
-
-
-
 /*------------- MAIN -------------*/
 int main(void)
 {
@@ -80,6 +77,7 @@ int main(void)
 
   while (1)
   {
+    ssd1306_clear();
     tud_task(); // tinyusb device task
     led_blinking_task();
 
@@ -156,11 +154,10 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
 
   case REPORT_ID_MOUSE:
   {
-    int8_t const delta = 5;
     read_all();
-    int8_t dx = acc_x() * acc_x() * 10.0;
-    int8_t dy = acc_y() * acc_y() * 10.0;
-
+    int8_t dx = acc_x() * acc_x() * acc_x() * -SCALE;
+    int8_t dy = acc_y() * acc_y() * acc_y() * 2 * SCALE;
+    draw_vector(acc_x(), acc_y(), 1);
 
     tud_hid_mouse_report(REPORT_ID_MOUSE, 0x00, dx, dy, 0, 0);
   }
