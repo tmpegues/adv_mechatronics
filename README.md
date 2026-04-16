@@ -19,5 +19,10 @@ If code from a specific assignment stops working, it's most likely because I've 
 
     https://github.com/user-attachments/assets/634b510a-0e1a-46f5-aa79-fc8a8d8a8de3
 
-5. [] [5: I2C IMU](https://github.com/ndm736/ME433_2026/wiki/HW5)
+5. [x] [5: I2C IMU](https://github.com/ndm736/ME433_2026/wiki/HW5)
     * [hw5 folder](./hw5/)
+
+    https://github.com/user-attachments/assets/b27ff88e-f733-4503-b9ed-5c7de13b1909
+
+6. [] [6: Mouse](https://github.com/ndm736/ME433_2026/wiki/HW6)
+    * [hw6 folder](./hw6/)
