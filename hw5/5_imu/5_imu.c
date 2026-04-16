@@ -29,21 +29,24 @@ int main()
         read_all();
         char message[30];
         // The 2 lines below are for plotting with python
+        float ax = acc_x();
+        float ay = acc_y();
+        float az = acc_z();
         // printf("A\n%+2.2f %+2.2f %+2.2f\n", acc_x(), acc_y(), acc_z());
         // printf("G\n%+2.2f %+2.2f %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
 
+        // ssd1306 is 128 x 32
+        ssd1306_clear();
         // acc_x - is board tilted to the right
         // acc_y + is board standing up on flat end
         // acc_z + is board flat
-
-        // ssd1306 is 128 x 32
-        ssd1306_clear();
-        int ax = -1 * acc_x() * 64;
-        int ay = acc_y() * 64;
-        draw_axes(ax, ay, 0);
-        draw_vector(ax, ay, 0);
+        ax *= -64;
+        ay *= 64;
+        az *= 64; // It isn't actually necessary to scale z, but it gets cast to an int
+        // draw_axes(ax, ay, az);
+        draw_vector(ax, ay, az);
 
         ssd1306_update();
-        // sleep_ms(100);
+        breathe_led(0);
     }
 }

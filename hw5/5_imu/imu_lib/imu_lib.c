@@ -72,7 +72,7 @@ void read_all(void)
     i2c_write_blocking(i2c_default, ADDR, &reg, 1, true);
     i2c_read_blocking(i2c_default, ADDR, all_data, 14, false);
 
-    ACC_X = all_data[0] << 8| all_data[1];
+    ACC_X = all_data[0] << 8 | all_data[1];
     ACC_Y = all_data[2] << 8 | all_data[3];
     ACC_Z = all_data[4] << 8 | all_data[5];
     TEMP = all_data[6] << 8 | all_data[7];

@@ -227,21 +227,23 @@ void draw_axes(int x, int y, int z)
 void draw_vector(int x, int y, int z)
 {
     // x, y, z are the endpoints of the vector.
-    printf("%+d %+d %+d\n", x, y, z);
-    int i = 0;
-    if (abs(x) >= abs(y))
+    for (int i = 0; i < 10; i++)
     {
-        while (abs(i) <= 5)
+        int x_px = 63 + x / 10 * i;
+        int y_px = 16 + y / 10 * i;
+        if (z >= 0)
         {
-            int x_px = 63 + x / 5 * i;
-            int y_px = 16 + y / 5 * i;
-            printf("%d: %d, %d\n", i, x_px, y_px);
             ssd1306_drawPixel(x_px, y_px, 1);
-            (x >= 0) ? i++ : i--;
+            ssd1306_drawPixel(x_px + 1, y_px, 1);
+            ssd1306_drawPixel(x_px - 1, y_px, 1);
+            ssd1306_drawPixel(x_px, y_px + 1, 1);
+            ssd1306_drawPixel(x_px, y_px - 1, 1);
         }
-    }
-    else
-    {
-        ;
+        else
+        {
+            ssd1306_drawPixel(x_px, y_px, 1);
+            ssd1306_drawPixel(x_px + 1, y_px, 1);
+            ssd1306_drawPixel(x_px - 1, y_px, 1);
+        }
     }
 }

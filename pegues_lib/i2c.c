@@ -23,7 +23,7 @@ void write_i2c(unsigned char address, unsigned char reg, unsigned char value)
 unsigned char read_i2c(unsigned char address, unsigned char reg, unsigned char length)
 {
     unsigned char buf;
-    i2c_write_blocking(i2c_default, address, &reg, 1, true); // true to keep host control of bus
+    i2c_write_blocking(i2c_default, address, &reg, 1, true);      // true to keep host control of bus
     i2c_read_blocking(i2c_default, address, &buf, length, false); // false - finished with bus
     // printf("All pins: %d\n", buf);
     return buf;
