@@ -28,15 +28,15 @@
 #define GYRO_ZOUT_L 0x48
 #define WHO_AM_I 0x75
 
-int ACC_X = 0;
-int ACC_Y = 0;
-int ACC_Z = 0;
+int16_t ACC_X = 0;
+int16_t ACC_Y = 0;
+int16_t ACC_Z = 0;
 
-int GYR_X = 0;
-int GYR_Y = 0;
-int GYR_Z = 0;
+int16_t GYR_X = 0;
+int16_t GYR_Y = 0;
+int16_t GYR_Z = 0;
 
-int TEMP = 0;
+int16_t TEMP = 0;
 
 bool init_imu(void)
 {
@@ -89,4 +89,19 @@ float acc_y(void)
 float acc_z(void)
 {
     return ACC_Z * 0.000061;
+}
+
+float gyr_x(void)
+{
+    return GYR_X * 0.007630;
+}
+
+float gyr_y(void)
+{
+    return GYR_Y * 0.007630;
+}
+
+float gyr_z(void)
+{
+    return GYR_Z * 0.007630;
 }

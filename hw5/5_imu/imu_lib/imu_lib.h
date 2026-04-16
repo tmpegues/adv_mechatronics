@@ -11,4 +11,8 @@ float acc_x(void);
 float acc_y(void);
 float acc_z(void);
 
+float gyr_x(void);
+float gyr_y(void);
+float gyr_z(void);
+
 #endif
