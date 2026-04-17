@@ -23,17 +23,18 @@ int main()
     float ax = 0;
     float ay = 0;
     float az = 0;
+    char message[30];
 
     while (true)
     {
         read_all();
-        char message[30];
+        ax = acc_x();
+        ay = acc_y();
+        az = acc_z();
+
         // The 2 lines below are for plotting with python
-        float ax = acc_x();
-        float ay = acc_y();
-        float az = acc_z();
-        printf("A\n%+2.2f %+2.2f %+2.2f\n", ax, ay, az);
-        printf("G\n%+2.2f %+2.2f %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
+        // printf("A\n%+2.2f %+2.2f %+2.2f\n", ax, ay, az);
+        // printf("G\n%+2.2f %+2.2f %+2.2f\n", gyr_x(), gyr_y(), gyr_z());
 
         // ssd1306 is 128 x 32
         ssd1306_clear();
