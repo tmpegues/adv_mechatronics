@@ -23,11 +23,10 @@
  *
  */
 
-#define SCALE 50
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h> // For sine and cosine
 
 #include "bsp/board_api.h"
 #include "tusb.h"
@@ -37,6 +36,12 @@
 #include "../../pegues_lib/imu_lib.h"
 #include "../../pegues_lib/i2c.h"
 #include "../../pegues_lib/ssd1306.h"
+
+#define SCALE 50
+#define BUTTON_1 22
+#define LED_1 21
+
+volatile bool manual_control = true;
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -59,6 +64,17 @@ static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 void led_blinking_task(void);
 void hid_task(void);
 
+void gpio_callback(uint gpio, uint32_t events)
+{
+  static absolute_time_t last_time = 0;
+
+  if (get_absolute_time() - last_time >= 10000)
+  {
+    manual_control = !manual_control;
+    last_time = get_absolute_time();
+  }
+}
+
 /*------------- MAIN -------------*/
 int main(void)
 {
@@ -67,6 +83,12 @@ int main(void)
   ssd1306_setup(true);
   init_imu();
 
+  gpio_init(BUTTON_1);
+  gpio_set_dir(BUTTON_1, GPIO_IN);
+
+  gpio_init(LED_1);
+  gpio_set_dir(LED_1, GPIO_OUT);
+
   // init device stack on configured roothub port
   tud_init(BOARD_TUD_RHPORT);
 
@@ -74,9 +96,12 @@ int main(void)
   {
     board_init_after_tusb();
   }
+  gpio_set_irq_enabled_with_callback(BUTTON_1, GPIO_IRQ_EDGE_FALL, true,
+                                     &gpio_callback);
 
   while (1)
   {
+    read_all();
     ssd1306_clear();
     tud_task(); // tinyusb device task
     led_blinking_task();
@@ -137,10 +162,23 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
 
   case REPORT_ID_MOUSE:
   {
-    read_all();
-    int8_t dx = acc_x() * acc_x() * acc_x() * -SCALE;
-    int8_t dy = acc_y() * acc_y() * acc_y() * 2 * SCALE;
-    draw_vector(acc_x(), acc_y(), 1);
+    int8_t dx = 0;
+    int8_t dy = 0;
+    if (manual_control)
+    {
+      gpio_put(LED_1, 0);
+      dx = acc_x() * acc_x() * acc_x() * -SCALE;
+      dy = acc_y() * acc_y() * acc_y() * 2 * SCALE;
+      draw_vector(acc_x(), acc_y(), 1);
+    }
+    else
+    {
+      gpio_put(LED_1, 1);
+      static int i = 0;
+      dx = 10*cos(.0628 * i);
+      dy = 10*sin(.0628 * i);
+      i = (i < 100) ? i + 1 : 0;
+    }
 
     tud_hid_mouse_report(REPORT_ID_MOUSE, 0x00, dx, dy, 0, 0);
   }
