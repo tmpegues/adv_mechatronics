@@ -68,7 +68,7 @@ void gpio_callback(uint gpio, uint32_t events)
 {
   static absolute_time_t last_time = 0;
 
-  if (get_absolute_time() - last_time >= 10000)
+  if (get_absolute_time() - last_time >= 100000)
   {
     manual_control = !manual_control;
     last_time = get_absolute_time();

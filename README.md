@@ -24,5 +24,7 @@ If code from a specific assignment stops working, it's most likely because I've 
 
     https://github.com/user-attachments/assets/b27ff88e-f733-4503-b9ed-5c7de13b1909
 
-6. [] [6: Mouse](https://github.com/ndm736/ME433_2026/wiki/HW6)
+6. [x] [6: Mouse](https://github.com/ndm736/ME433_2026/wiki/HW6)
     * [hw6 folder](./hw6/)
+
+    https://github.com/user-attachments/assets/526ab64d-ac11-4910-af54-4754fc8acde6
