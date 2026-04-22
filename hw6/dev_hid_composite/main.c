@@ -169,7 +169,7 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
       gpio_put(LED_1, 0);
       dx = acc_x() * acc_x() * acc_x() * -SCALE;
       dy = acc_y() * acc_y() * acc_y() * 2 * SCALE;
-      draw_vector(acc_x(), acc_y(), 1);
+      draw_vector(acc_x(), acc_y(), acc_z());
     }
     else
     {
