@@ -7,7 +7,7 @@
 #include "../../pegues_lib/ssd1306.h"
 
 // SPI Defines
-// We are going to use SPI 0, and allocate it to the following GPIO pins
+// We are going to use SPI 1, and allocate it to the following GPIO pins
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
 #define SPI_PORT spi1
 #define PIN_MISO 8
@@ -30,24 +30,63 @@ void init_spi()
     // For more examples of SPI use see https://github.com/raspberrypi/pico-examples/tree/master/spi
 }
 
+static inline void cs_select(uint cs_pin)
+{
+    asm volatile("nop \n nop \n nop"); // FIXME
+    gpio_put(cs_pin, 0);
+    asm volatile("nop \n nop \n nop"); // FIXME
+}
+
+static inline void cs_deselect(uint cs_pin)
+{
+    asm volatile("nop \n nop \n nop"); // FIXME
+    gpio_put(cs_pin, 1);
+    asm volatile("nop \n nop \n nop"); // FIXME
+}
+
+void write_dac(bool pin_a, uint16_t value)
+{
+    // We've only got 10 bits available
+    if (value <= 0b1111111111)
+    {
+        uint8_t data[8];
+        data[0] = pin_a << 7 | 0b011 << 4 | ((value >> 6) & 0b00001111);
+        data[1] = value & 0b11111100;
+        cs_select(PIN_CS);
+        spi_write_blocking(SPI_PORT, data, 2); // where data is a uint8_t array with length len
+        cs_deselect(PIN_CS);
+    }
+}
+
 int main()
 {
-    await_usb(0, true); // Remove in final version
+    await_usb(.1, true);
     init_i2c();
     ssd1306_setup(true);
     init_spi();
     printf("SPI inited\n");
     // printf("Sending\n\n"); // Indicates to the python plotter that data will start being sent
-    // sleep_ms(100);
 
-    // char message[30];
+    // // Calculate sine wave points
+    // float sine_freq = 2;
+    // float dac_freq = 50 * sine_freq;
+
+    char message[30];
+    sprintf(message, "Starting");
+    ssd1306_write(0, 0, message);
+    ssd1306_update();
+    int i = 0;
+    sleep_ms(100);
 
     while (true)
     {
+        write_dac(1, i);
+
         ssd1306_clear();
-
-
+        sprintf(message, "loop %d", i);
+        ssd1306_write(0, 0, message);
         ssd1306_update();
         breathe_led(0);
+        i = (i > 0b1111111111 ? 0 : i + 10);
     }
 }
