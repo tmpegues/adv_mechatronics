@@ -47,6 +47,9 @@ target_sources(dev_hid_composite PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/usb_descriptors.c
         )
 
+
+
+
 # Make sure TinyUSB can find tusb_config.h
 target_include_directories(dev_hid_composite PUBLIC
         ${CMAKE_CURRENT_LIST_DIR})
@@ -55,6 +58,7 @@ target_include_directories(dev_hid_composite PUBLIC
 # for TinyUSB device support and tinyusb_board for the additional board support library used by the example
 target_link_libraries(dev_hid_composite
                     PUBLIC
+                        pico_cyw43_arch_none
                         pico_stdlib
                         pico_unique_id
                         tinyusb_device
