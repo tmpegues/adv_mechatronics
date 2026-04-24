@@ -53,11 +53,8 @@ void write_dac(bool pin_a, uint16_t value)
     if (value <= 0b1111111111)
     {
         uint8_t data[8];
-        // data[0] = !pin_a << 7 | 0b111 << 4 | ((value >> 6) & 0b00001111);
-        // data[1] = value << 2 & 0b11111100;
-        data[0] = 0b01111111;
-        data[1] = 0b11111100;
-        // data[1] = value << 2 & 0b11111100;
+        data[0] = !pin_a << 7 | 0b111 << 4 | ((value >> 6) & 0b00001111);
+        data[1] = value << 2 & 0b11111100;
         printf("data0, data1: %x %x\n", data[0], data[1]);
 
         cs_select(PIN_CS);
@@ -99,7 +96,7 @@ int main()
         {
             value = 1;
         }
-        write_dac(false, value);
+        write_dac(true, value);
 
         ssd1306_clear();
         sprintf(message, "loop %d\n", i);
