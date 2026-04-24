@@ -11,7 +11,7 @@
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
 #define SPI_PORT spi1
 #define PIN_MISO 12
-#define PIN_CS 17
+#define PIN_CS 13
 #define PIN_SCK 10
 #define PIN_MOSI 11
 
