@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
-#include "hardware/i2c.h"
-#include "pico/cyw43_arch.h"
 
 #include "../../pegues_lib/pegues_lib.h"
 #include "../../pegues_lib/i2c.h"
@@ -34,26 +32,22 @@ void init_spi()
 
 int main()
 {
-    await_usb(0, true);
-    stdio_init_all();
-
-    // init_led();
-    breathe_led(-1);
-
+    await_usb(0, true); // Remove in final version
     init_i2c();
-    // ssd1306_setup(true);
-    // unsigned char oled_message[50];
-    // sprintf(oled_message, "OLED on");
-    // ssd1306_drawString(0, 0, oled_message);
+    ssd1306_setup(true);
+    init_spi();
+    printf("SPI inited\n");
+    // printf("Sending\n\n"); // Indicates to the python plotter that data will start being sent
+    // sleep_ms(100);
 
-    // // init_spi();
-    // sprintf(oled_message, "SPI on");
-    // ssd1306_drawString(0, 8, oled_message);
+    // char message[30];
 
     while (true)
     {
-        breathe_led(-1);
-        printf("Hello, world!\n");
-        sleep_ms(10);
+        ssd1306_clear();
+
+
+        ssd1306_update();
+        breathe_led(0);
     }
 }

@@ -36,9 +36,9 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(7_dac 7_dac.c
-                    ../../pegues_lib/pegues_lib.c
-                    ../../pegues_lib/ssd1306.c
-                    ../../pegues_lib/i2c.c)
+                     ../../pegues_lib/pegues_lib.c
+                     ../../pegues_lib/ssd1306.c
+                     ../../pegues_lib/i2c.c)
 
 pico_set_program_name(7_dac "7_dac")
 pico_set_program_version(7_dac "0.1")
@@ -58,9 +58,9 @@ target_include_directories(7_dac PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(7_dac
-        hardware_spi
-        hardware_i2c
-        pico_cyw43_arch_none
+                      hardware_i2c
+                      hardware_spi
+                      pico_cyw43_arch_none
         )
 
 pico_add_extra_outputs(7_dac)
