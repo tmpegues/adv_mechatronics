@@ -152,7 +152,7 @@ void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *c
 // This function uses character coordinates instead of pixel coordinates
 void ssd1306_write(unsigned char row, unsigned char column, unsigned char *character)
 {
-    ssd1306_drawString(column*8, row*5, character);
+    ssd1306_drawString(column*5, row*8, character);
 }
 
 // zero every pixel value

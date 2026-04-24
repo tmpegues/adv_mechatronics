@@ -10,15 +10,17 @@
 // We are going to use SPI 1, and allocate it to the following GPIO pins
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
 #define SPI_PORT spi1
-#define PIN_MISO 8
-#define PIN_CS 9
-#define PIN_SCK 6
-#define PIN_MOSI 7
+#define PIN_MISO 12
+#define PIN_CS 17
+#define PIN_SCK 10
+#define PIN_MOSI 11
 
 void init_spi()
 {
     // SPI initialisation. This example will use SPI at 1MHz.
-    spi_init(SPI_PORT, 1000 * 1000);
+    // spi_init(SPI_PORT, 1000 * 1000);
+    spi_init(SPI_PORT, 1000);
+
     gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
     gpio_set_function(PIN_CS, GPIO_FUNC_SIO);
     gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
@@ -47,11 +49,17 @@ static inline void cs_deselect(uint cs_pin)
 void write_dac(bool pin_a, uint16_t value)
 {
     // We've only got 10 bits available
+
     if (value <= 0b1111111111)
     {
         uint8_t data[8];
-        data[0] = pin_a << 7 | 0b011 << 4 | ((value >> 6) & 0b00001111);
-        data[1] = value & 0b11111100;
+        // data[0] = !pin_a << 7 | 0b111 << 4 | ((value >> 6) & 0b00001111);
+        // data[1] = value << 2 & 0b11111100;
+        data[0] = 0b01111111;
+        data[1] = 0b11111100;
+        // data[1] = value << 2 & 0b11111100;
+        printf("data0, data1: %x %x\n", data[0], data[1]);
+
         cs_select(PIN_CS);
         spi_write_blocking(SPI_PORT, data, 2); // where data is a uint8_t array with length len
         cs_deselect(PIN_CS);
@@ -72,21 +80,36 @@ int main()
     // float dac_freq = 50 * sine_freq;
 
     char message[30];
+    char data[30];
+
     sprintf(message, "Starting");
     ssd1306_write(0, 0, message);
     ssd1306_update();
     int i = 0;
     sleep_ms(100);
+    uint16_t value = 0;
 
     while (true)
     {
-        write_dac(1, i);
+        if (i % 2 == 0)
+        {
+            value = 0b1111111111;
+        }
+        else
+        {
+            value = 1;
+        }
+        write_dac(false, value);
 
         ssd1306_clear();
-        sprintf(message, "loop %d", i);
+        sprintf(message, "loop %d\n", i);
+        printf(message);
+
         ssd1306_write(0, 0, message);
+
         ssd1306_update();
         breathe_led(0);
-        i = (i > 0b1111111111 ? 0 : i + 10);
+        sleep_ms(100);
+        i++;
     }
 }
