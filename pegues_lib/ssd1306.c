@@ -118,6 +118,7 @@ void ssd1306_drawLetter(unsigned char x_or, unsigned char y_or, unsigned char ch
     }
 }
 
+// 25 char x 4 rows
 void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *character)
 {
     int i = 0;
@@ -146,6 +147,12 @@ void ssd1306_drawString(unsigned char x_or, unsigned char y_or, unsigned char *c
         }
         i++;
     }
+}
+
+// This function uses character coordinates instead of pixel coordinates
+void ssd1306_write(unsigned char row, unsigned char column, unsigned char *character)
+{
+    ssd1306_drawString(column*8, row*5, character);
 }
 
 // zero every pixel value
