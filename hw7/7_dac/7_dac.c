@@ -18,6 +18,13 @@
 
 #define PI 3.1415
 
+#define SINE_FREQ 2.0
+#define SINE_STEPS (int)(50.0 * SINE_FREQ)
+uint16_t dac_sine[SINE_STEPS];
+uint16_t dac_tri[SINE_STEPS];
+
+struct repeating_timer dac_timer;
+
 void init_spi()
 {
     // SPI initialisation. This example will use SPI at 1MHz.
@@ -49,23 +56,35 @@ static inline void cs_deselect(uint cs_pin)
     asm volatile("nop \n nop \n nop"); // FIXME
 }
 
-void write_dac(bool pin_a, uint16_t value)
+void write_dac(uint16_t a_value, uint16_t b_value)
 {
-    // We've only got 10 bits available
+    cs_select(PIN_CS);
+    uint8_t data[8];
+    if (a_value <= 0b1111111111) // We've only got 10 bits available
 
-    if (value <= 0b1111111111)
+    {
+        data[0] = 0b0111 << 4 | ((a_value >> 6) & 0b00001111);
+        data[1] = a_value << 2 & 0b11111100;
+
+        spi_write_blocking(SPI_PORT, data, 2); // where data is a uint8_t array with length len
+    }
+    if (b_value <= 0b1111111111)
     {
         uint8_t data[8];
-        data[0] = !pin_a << 7 | 0b111 << 4 | ((value >> 6) & 0b00001111);
-        data[1] = value << 2 & 0b11111100;
+        data[0] = 0b1111 << 4 | ((b_value >> 6) & 0b00001111);
+        data[1] = b_value << 2 & 0b11111100;
 
-        cs_select(PIN_CS);
-        spi_write_blocking(SPI_PORT, data, 2); // where data is a uint8_t array with length len
-        cs_deselect(PIN_CS);
+        spi_write_blocking(SPI_PORT, data, 2);
     }
+    cs_deselect(PIN_CS);
 }
 
-
+bool dac_timer_callback(__unused struct repeating_timer *t)
+{
+    static int sine = 0;
+    write_dac(dac_sine[sine], dac_tri[sine]);
+    sine = (sine + 1) % SINE_STEPS;
+}
 
 int main()
 {
@@ -74,24 +93,18 @@ int main()
     ssd1306_setup(true);
     init_spi();
     printf("SPI inited\n");
-    // printf("Sending\n\n"); // Indicates to the python plotter that data will start being sent
 
     // Calculate sine wave points. They'll be between 0 and 0b1111111111.
-    float sine_freq = 2;
-    int sine_steps = (int)(50 * sine_freq);
-    uint16_t dac_sine[sine_steps];
-    uint16_t dac_tri[sine_steps];
-
-    for (int i = 0; i < sine_steps; i++)
+    for (int i = 0; i < SINE_STEPS; i++)
     {
         dac_sine[i] = (-cos((float)i / (100.0) * (4.0 * PI)) + 1.0) / 2.0 * (float)0b1111111111;
-        if (i < sine_steps / 2)
+        if (i < SINE_STEPS / 2)
         {
-            dac_tri[i] = 2.0*(float)i * (float)0b1111111111 / (float)sine_steps;
+            dac_tri[i] = 2.0 * (float)i * (float)0b1111111111 / (float)SINE_STEPS;
         }
         else
         {
-            dac_tri[i] = 2.0*(float)0b1111111111 * (1 - (float)i / (float)sine_steps);
+            dac_tri[i] = 2.0 * (float)0b1111111111 * (1 - (float)i / (float)SINE_STEPS);
         }
         printf("%d\n", dac_tri[i]);
     }
@@ -102,18 +115,13 @@ int main()
     sprintf(message, "Starting");
     ssd1306_write(0, 0, message);
     ssd1306_update();
-    int sine = 0;
     sleep_ms(100);
-    int i = 0;
+    add_repeating_timer_ms(-10, dac_timer_callback, NULL, &dac_timer);
+
     while (true)
     {
-        printf("s: %d\n", sine);
-        write_dac(true, dac_sine[sine]);
-        write_dac(false, dac_tri[sine]);
-        sine = (sine >= sine_steps ? 0 : sine + 1);
 
-        sleep_ms(10); // Might put this in a timer if I've got time
         breathe_led(0);
-        i++;
+        sleep_ms(10);
     }
 }
