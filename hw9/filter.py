@@ -20,7 +20,8 @@ for i in range(len(files)):
 
     axes[i].plot(t,data1,'b-*')
     axes[i].set_title(files[i])
-
+    axes[i].set_xlabel('Time [s]')
+    axes[i].set_ylabel('Signal')
 plt.show()
 
 
