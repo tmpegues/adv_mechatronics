@@ -129,7 +129,7 @@ def plot_iir(ax_signal, ax_fft, file, B):
                 smoothed_signal.append(A*smoothed_signal[-1] + B*signal[-1])
 
     ax_signal.plot(t, signal, 'k', label='Raw Signal')
-    ax_signal.plot(t, smoothed_signal, 'r', label='Average Smoothed Signal')
+    ax_signal.plot(t, smoothed_signal, 'r', label='IIR Smoothed Signal')
 
     ax_signal.set_title(f'{file} and IIR Smoothed Signal (A = {A:.4f} B = {B:.4f})')
     ax_signal.set_xlabel('Time [s]')
@@ -155,7 +155,7 @@ def plot_iir(ax_signal, ax_fft, file, B):
     Y = np.fft.fft(smoothed_signal)/len(smoothed_signal) # fft computing and normalization
     Y = Y[range(int(len(smoothed_signal)/2))]
 
-    ax_fft.loglog(frq,abs(Y),'r', label='IIT Smoothed FFT') # plotting the fft
+    ax_fft.loglog(frq,abs(Y),'r', label='IIR Smoothed FFT') # plotting the fft
     ax_fft.set_title(file+' FFT')
     ax_fft.set_xlabel('Freq (Hz)')
     ax_fft.set_ylabel('|Y(freq)|')
