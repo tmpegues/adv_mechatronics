@@ -105,9 +105,15 @@ def plot_averaged(ax_signal, ax_fft, file, average_length):
 files = ['sigA', 'sigB', 'sigC', 'sigD']
 fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8)) = plt.subplots(2, 4)
 axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
-averages = [5, 5, 5, 5]
+averages = [1000, 300, 1, 1000]
+# files = ['sigD']
+# averages = [250, 500, 750, 1000]
 for i in range(len(files)):
     plot_averaged(axes[2*i], axes[2*i+1], files[i], averages[i])
+    # for average in averages:
+    #     fig, (ax1, ax2) = plt.subplots(1, 2)
+    #     plot_averaged(ax1, ax2, files[i], average)
+
     # t = [] # column 0
     # data1 = [] # column 1
 
