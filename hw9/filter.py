@@ -237,12 +237,12 @@ def plot_fir(ax_signal, ax_fft, file):
     ax_fft.legend()
 
 
-# files = ['sigA', 'sigB', 'sigC', 'sigD']
-# fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8)) = plt.subplots(2, 4)
-# axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
+files = ['sigA', 'sigB', 'sigC', 'sigD']
+fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8)) = plt.subplots(2, 4)
+axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
 averages = [1000, 300, 1, 1000]
 iirs = [1/750, 1/150, 1, 1/500]
-files = ['sigD']
+# files = ['sigD']
 # iirs = [1/500]
 # averages = [250, 500, 750, 1000]
 for i in range(len(files)):
@@ -256,8 +256,10 @@ for i in range(len(files)):
     #     fig, (ax1, ax2) = plt.subplots(1, 2)
     #     plot_iir(ax1, ax2, files[i], iir)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-    plot_fir(ax1, ax2, files[0])
+    plot_fir(axes[2*i], axes[2*i+1], files[i])
+    # fig, (ax1, ax2) = plt.subplots(1, 2)
+    # plot_fir(ax1, ax2, files[0])
+
 
 plt.show()
 
