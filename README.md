@@ -36,3 +36,5 @@ If code from a specific assignment stops working, it's most likely because I've 
 8. [ ] [8: SPI RAM](https://github.com/ndm736/ME433_2026/wiki/HW8)
     * [hw8 folder](./hw8)
 
+9. [x] [9: Filtering](https://github.com/ndm736/ME433_2026/wiki/HW9)
+    * [hw9 folder](./hw9)
