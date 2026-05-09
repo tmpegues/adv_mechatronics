@@ -41,7 +41,7 @@ void write_dac(int cs_pin, uint16_t a_value, uint16_t b_value)
     uint8_t data[8];
     if (a_value <= 0b1111111111) // We've only got 10 bits available
 
-    {
+    { // MCP4912 write register (A[0]/B[1])(BUF)(GA)(SHDN)(4 bits of value), (6 bits of value)(2 bits ignored)
         data[0] = 0b0111 << 4 | ((a_value >> 6) & 0b00001111);
         data[1] = a_value << 2 & 0b11111100;
 
