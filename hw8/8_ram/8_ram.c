@@ -9,21 +9,28 @@
 
 
 #define DAC_CS 13
-
+#define RAM_CS 14
 
 #define PI 3.1415
 
 #define SINE_STEPS 1000
-uint16_t dac_sine[SINE_STEPS];
-uint16_t dac_tri[SINE_STEPS];
+float dac_sine[SINE_STEPS];
 
 struct repeating_timer dac_timer;
 
+union FloatInt
+{
+    float f;
+    uint32_t i;
+};
+
+union FloatInt ram_sine[SINE_STEPS];
 
 bool dac_timer_callback(__unused struct repeating_timer *t)
 {
     static int sine = 0;
-    write_dac(DAC_CS, dac_sine[sine], dac_tri[sine]);
+    write_dac(DAC_CS, dac_sine[sine], -1);
+    // printf("%f\n",dac_sine[sine]);
     sine = (sine + 1) % SINE_STEPS;
 }
 
@@ -35,19 +42,13 @@ int main()
     init_spi();
     printf("SPI inited\n");
 
-    // Calculate sine wave points. They'll be between 0 and 0b1111111111.
+    // Calculate sine wave points. They'll be floats between 0 and 3.3.
     for (int i = 0; i < SINE_STEPS; i++)
     {
-        dac_sine[i] = (-cos((float)i / (100.0) * (4.0 * PI)) + 1.0) / 2.0 * (float)0b1111111111;
-        if (i < SINE_STEPS / 2)
-        {
-            dac_tri[i] = 2.0 * (float)i * (float)0b1111111111 / (float)SINE_STEPS;
-        }
-        else
-        {
-            dac_tri[i] = 2.0 * (float)0b1111111111 * (1 - (float)i / (float)SINE_STEPS);
-        }
-        printf("%d\n", dac_tri[i]);
+        union FloatInt value;
+        value.f = (float)((-cos((float)i / (1000.0) * (2.0 * PI)) + 1.0) / 2.0 * 3.3);
+        ram_sine[i] = value;
+        printf("ram sine: %f\n", ram_sine[i].f);
     }
 
     char message[30];
@@ -58,11 +59,13 @@ int main()
     ssd1306_update();
     sleep_ms(100);
     add_repeating_timer_ms(-10, dac_timer_callback, NULL, &dac_timer);
+    int i = 0;
 
     while (true)
     {
-
         breathe_led(0);
         sleep_ms(10);
+        printf("ram sine %d: %f\n", i, ram_sine[i].f);
+        i = (i + 1) % SINE_STEPS;
     }
 }
