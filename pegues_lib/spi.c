@@ -5,6 +5,9 @@
 #define PIN_SCK 10
 #define PIN_MOSI 11
 
+#define RAM_READ 0b00000011
+#define RAM_WRITE 0b00000010
+
 void init_spi()
 {
     spi_init(SPI_PORT, 1000 * 1000);
@@ -55,5 +58,15 @@ void write_dac(int cs_pin, uint16_t a_value, uint16_t b_value)
 
         spi_write_blocking(SPI_PORT, data, 2);
     }
+    cs_deselect(cs_pin);
+}
+
+void init_ram(int cs_pin)
+{
+    uint8_t data[2];
+    data[0] = 0b00000001; // Instruction to write to status register
+    data[1] = 0b01000000; // (01 = sequential)(5 bits empty)(last bit 0 enables HOLD)
+    cs_select(cs_pin);
+    spi_write_blocking(SPI_PORT, data, 2);
     cs_deselect(cs_pin);
 }

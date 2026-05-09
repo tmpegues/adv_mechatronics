@@ -16,5 +16,6 @@ static inline void cs_deselect(uint cs_pin);
 
 void write_dac(int cs_pin, uint16_t a_value, uint16_t b_value);
 
+void init_ram(int);
 
 #endif

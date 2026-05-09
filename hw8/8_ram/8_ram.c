@@ -34,6 +34,7 @@ bool dac_timer_callback(__unused struct repeating_timer *t)
     sine = (sine + 1) % SINE_STEPS;
 }
 
+
 int main()
 {
     await_usb(0.5, true);
@@ -41,6 +42,7 @@ int main()
     ssd1306_setup(true);
     init_spi();
     printf("SPI inited\n");
+    init_ram(RAM_CS);
 
     // Calculate sine wave points. They'll be floats between 0 and 3.3.
     for (int i = 0; i < SINE_STEPS; i++)
