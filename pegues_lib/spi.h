@@ -28,6 +28,6 @@ void write_dac(int cs_pin, uint16_t a_value, uint16_t b_value);
 
 void init_ram(int);
 
-void ram_write_one(uint8_t cs_pin, uint8_t addr, uint8_t value);
+uint32_t ram_read_float(uint8_t cs_pin, uint16_t addr);
 
 #endif

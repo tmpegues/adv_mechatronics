@@ -57,13 +57,19 @@ void init_ram(int cs_pin)
     cs_deselect(cs_pin);
 }
 
-void ram_write_one(uint8_t cs_pin, uint8_t addr, uint8_t value)
+uint32_t ram_read_float(uint8_t cs_pin, uint16_t addr)
 {
-    uint8_t data[3];
-    data[0] = 0b00000010;
-    data[1] = addr;
-    data[2] = value;
+    uint8_t read_instr[3];
+    read_instr[0] = 0b00000011;
+    read_instr[1] = addr >> 8;
+    read_instr[2] = addr & 0xFF;
+    uint8_t read_data[4];
+
     cs_select(cs_pin);
-    spi_write_blocking(SPI_PORT, data, 3);
+    spi_write_blocking(SPI_PORT, read_instr, 3);
+    spi_read_blocking(SPI_PORT, 0, read_data, 4);
     cs_deselect(cs_pin);
+
+    uint32_t value = read_data[0] << 24 | read_data[1] << 16 | read_data[2] << 8 | read_data[3];
+    return value;
 }
