@@ -48,23 +48,21 @@ int main()
     // Calculate sine wave points. They'll be floats between 0 and 3.3.
     for (int i = 0; i < SINE_STEPS; i++)
     {
-        int j = 4 * i + 2;
+        int j = 4 * i + 2; // *4 because 4 byte float, +2 because those indexes are already reserved.
         union FloatInt value;
         value.f = (float)((-cos((float)i / (1000.0) * (2.0 * PI)) + 1.0) / 2.0 * 3.3);
-        for (int k = 0; k < 4; k++) // *4 and < 4 because the float is 4 bytes. +2 because those indexes are already reserved.
+        for (int k = 0; k < 4; k++) // <4 because 4 byte float, same as above
         {
             uint8_t bits = value.i >> ((8 * (3 - k)) & 0xFF); // 8*(3-k) so we start with >> 24, then >> 16, ...
             ram_sine[j + k] = bits;
+            // ram_write_one(RAM_CS, j+k, bits);
         }
     }
 
-    // // Store values in ram, sequential load
-    // for (int i = 0; i < SINE_STEPS; i++)
-    // {
-    //     cs_select(RAM_CS);
-    //     spi_write_blocking(spi1, ram_sine, 4*SINE_STEPS + 2);
-    //     cs_deselect(RAM_CS);
-    // }
+    // Store values in ram, sequential load
+    cs_select(RAM_CS);
+    spi_write_blocking(spi1, ram_sine, 4*SINE_STEPS + 2);
+    cs_deselect(RAM_CS);
 
     char message[30];
     char data[30];
@@ -75,6 +73,9 @@ int main()
     sleep_ms(100);
     add_repeating_timer_ms(-10, dac_timer_callback, NULL, &dac_timer);
 
+    sprintf(message, "Looping");
+    ssd1306_write(0, 0, message);
+    ssd1306_update();
     while (true)
     {
         breathe_led(0);
