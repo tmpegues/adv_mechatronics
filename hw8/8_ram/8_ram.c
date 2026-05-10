@@ -27,10 +27,12 @@ uint8_t ram_sine[SINE_STEPS * 4 + 2]; // *4 because I'm storing 32 bit floats, +
 
 bool dac_timer_callback(__unused struct repeating_timer *t)
 {
-    static int sine = 0;
-    write_dac(DAC_CS, dac_sine[sine], -1);
-    // printf("%f\n",dac_sine[sine]);
-    sine = (sine + 1) % SINE_STEPS;
+    static uint16_t sine_index = 0;
+    static union FloatInt sine_value;
+    sine_value.i = ram_read_float(RAM_CS, sine_index*4);
+
+    write_dac(DAC_CS, sine_value.f, -1);
+    sine_index = (sine_index + 1) % SINE_STEPS;
 }
 
 int main()
@@ -55,13 +57,12 @@ int main()
         {
             uint8_t bits = value.i >> ((8 * (3 - k)) & 0xFF); // 8*(3-k) so we start with >> 24, then >> 16, ...
             ram_sine[j + k] = bits;
-            // ram_write_one(RAM_CS, j+k, bits);
         }
     }
 
     // Store values in ram, sequential load
     cs_select(RAM_CS);
-    spi_write_blocking(spi1, ram_sine, 4*SINE_STEPS + 2);
+    spi_write_blocking(spi1, ram_sine, 4 * SINE_STEPS + 2);
     cs_deselect(RAM_CS);
 
     char message[30];
