@@ -24,20 +24,6 @@ void init_spi_cs(int cs_pin)
     gpio_put(cs_pin, 1);
 }
 
-static inline void cs_select(uint cs_pin)
-{
-    asm volatile("nop \n nop \n nop"); // FIXME
-    gpio_put(cs_pin, 0);
-    asm volatile("nop \n nop \n nop"); // FIXME
-}
-
-static inline void cs_deselect(uint cs_pin)
-{
-    asm volatile("nop \n nop \n nop"); // FIXME
-    gpio_put(cs_pin, 1);
-    asm volatile("nop \n nop \n nop"); // FIXME
-}
-
 void write_dac(int cs_pin, uint16_t a_value, uint16_t b_value)
 {
     cs_select(cs_pin);
@@ -68,5 +54,16 @@ void init_ram(int cs_pin)
     data[1] = 0b01000000; // (01 = sequential)(5 bits empty)(last bit 0 enables HOLD)
     cs_select(cs_pin);
     spi_write_blocking(SPI_PORT, data, 2);
+    cs_deselect(cs_pin);
+}
+
+void ram_write_one(uint8_t cs_pin, uint8_t addr, uint8_t value)
+{
+    uint8_t data[3];
+    data[0] = 0b00000010;
+    data[1] = addr;
+    data[2] = value;
+    cs_select(cs_pin);
+    spi_write_blocking(SPI_PORT, data, 3);
     cs_deselect(cs_pin);
 }
