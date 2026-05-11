@@ -71,6 +71,6 @@ uint16_t ram_read_16(uint8_t cs_pin, uint16_t addr)
     cs_deselect(cs_pin);
 
     uint16_t value = read_data[0] << 8 | read_data[1];
-    printf("addr, ram read: %16b %b\n", addr, value);
+    // printf("addr, ram read: %16b %16b\n", addr, value);
     return value;
 }

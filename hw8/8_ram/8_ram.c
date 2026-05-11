@@ -60,24 +60,17 @@ int main()
         {
             uint8_t bits = value >> ((8 * (1 - k)) & 0xFF); // 8*(1-k) so we start with >> 8 then >> 0
             ram_sine[j + k] = bits;
-            if (k == 0)
-            {
-                printf("j+k, bits: %4d, %8b", j + k, bits);
-            }
-            else
-            {
-                printf("%8b (j+k = %4d)\n", bits, j + k);
-            }
+            // if (k == 0)
+            // {
+            //     printf("j+k, bits: %4d, %8b", j + k, bits);
+            // }
+            // else
+            // {
+            //     printf("%8b (j+k = %4d)\n", bits, j + k);
+            // }
         }
     }
-    // printf("Done with calculation\n");
-    // for (int i = 0; i< SINE_STEPS * 2 + ARRAY_OFFSET; i++)
-    // {
-    //     printf("i, value: %4d, %8b\n", i, ram_sine[i]);
-    // }
 
-    // Store values in ram, sequential load
-    printf("ram_sine 0, 1, 2: %b, %b, %b\n", ram_sine[0], ram_sine[1], ram_sine[2]);
     cs_select(RAM_CS);
     spi_write_blocking(spi1, ram_sine, 2 * SINE_STEPS + ARRAY_OFFSET);
     cs_deselect(RAM_CS);
