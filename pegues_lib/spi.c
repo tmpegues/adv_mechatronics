@@ -67,10 +67,10 @@ uint16_t ram_read_16(uint8_t cs_pin, uint16_t addr)
 
     cs_select(cs_pin);
     spi_write_blocking(SPI_PORT, read_instr, 3);
-    spi_read_blocking(SPI_PORT, 0, read_data, 2);
+    spi_read_blocking(SPI_PORT, 0xFF, read_data, 2);
     cs_deselect(cs_pin);
 
     uint16_t value = read_data[0] << 8 | read_data[1];
-    // printf("%d\n", value);
+    printf("addr, ram read: %16b %b\n", addr, value);
     return value;
 }

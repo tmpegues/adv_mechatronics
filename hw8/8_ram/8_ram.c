@@ -13,7 +13,8 @@
 #define PI 3.1415
 
 #define SINE_STEPS 1000
-uint8_t ram_sine[SINE_STEPS * 2 + 2]; // *4 because I'm storing 16 bit values, +2 to add dac instruction and address
+#define ARRAY_OFFSET 3                           // This will hold the first n slots in the array for the instruction and address
+uint8_t ram_sine[SINE_STEPS * 2 + ARRAY_OFFSET]; // *4 because I'm storing 16 bit values
 
 struct repeating_timer dac_timer;
 
@@ -44,12 +45,13 @@ int main()
 
     ram_sine[0] = 0b00000010;
     ram_sine[1] = 0b0;
+    ram_sine[2] = 0b0;
 
     // Calculate sine wave points. They'll be floats between 0 and 3.3.
     // Nevermind, they're supposed to be formatted for the DAC (uint16 <= 0b1111111111)
     for (int i = 0; i < SINE_STEPS; i++)
     {
-        int j = 2 * i + 2; // *2 because 2 byte values, +2 because those indexes are already reserved.
+        int j = 2 * i + ARRAY_OFFSET; // *2 because 2 byte values
         uint16_t value;
         value = (-cos((float)i / (1000.0) * (4.0 * PI)) + 1.0) / 2.0 * 0b1111111111;
         for (int k = 0; k < 2; k++) // <2 because 2 byte value, same as above
@@ -58,18 +60,19 @@ int main()
             ram_sine[j + k] = bits;
             if (k == 0)
             {
-                printf("j+k, bits: %4d, %8b,", j+k, bits);
+                printf("j+k, bits: %4d, %8b,", j + k, bits);
             }
             else
             {
-                printf("%8b (j+k = %4d)\n", bits, j+k);
+                printf("%8b (j+k = %4d)\n", bits, j + k);
             }
         }
     }
 
     // Store values in ram, sequential load
+    printf("ram_sine 0, 1, 2: %b, %b, %b\n", ram_sine[0], ram_sine[1], ram_sine[2]);
     cs_select(RAM_CS);
-    spi_write_blocking(spi1, ram_sine, 2 * SINE_STEPS + 2);
+    spi_write_blocking(spi1, ram_sine, 2 * SINE_STEPS + ARRAY_OFFSET);
     cs_deselect(RAM_CS);
 
     char message[30];
