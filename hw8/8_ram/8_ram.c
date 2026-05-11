@@ -14,7 +14,7 @@
 
 #define SINE_STEPS 1000
 #define ARRAY_OFFSET 3                           // This will hold the first n slots in the array for the instruction and address
-uint8_t ram_sine[SINE_STEPS * 2 + ARRAY_OFFSET]; // *4 because I'm storing 16 bit values
+uint8_t ram_sine[SINE_STEPS * 2 + ARRAY_OFFSET]; // *2 because I'm storing 16 bit values
 
 struct repeating_timer dac_timer;
 
@@ -60,7 +60,7 @@ int main()
             ram_sine[j + k] = bits;
             if (k == 0)
             {
-                printf("j+k, bits: %4d, %8b,", j + k, bits);
+                printf("j+k, bits: %4d, %8b", j + k, bits);
             }
             else
             {
@@ -68,6 +68,11 @@ int main()
             }
         }
     }
+    // printf("Done with calculation\n");
+    // for (int i = 0; i< SINE_STEPS * 2 + ARRAY_OFFSET; i++)
+    // {
+    //     printf("i, value: %4d, %8b\n", i, ram_sine[i]);
+    // }
 
     // Store values in ram, sequential load
     printf("ram_sine 0, 1, 2: %b, %b, %b\n", ram_sine[0], ram_sine[1], ram_sine[2]);
