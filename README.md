@@ -33,8 +33,11 @@ If code from a specific assignment stops working, it's most likely because I've 
     * [hw7 folder](./hw7)
     ![scope with sine and triangle waves](./hw7/images/scope.jpg)
 
-8. [ ] [8: SPI RAM](https://github.com/ndm736/ME433_2026/wiki/HW8)
+8. [x] [8: SPI RAM](https://github.com/ndm736/ME433_2026/wiki/HW8)
     * [hw8 folder](./hw8)
 
 9. [x] [9: Filtering](https://github.com/ndm736/ME433_2026/wiki/HW9)
     * [hw9 folder](./hw9)
+
+10. [x] [10: Python Graphics](https://github.com/ndm736/ME433_2026/wiki/HW10)
+    * [hw10 folder](./hw10)
