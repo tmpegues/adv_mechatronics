@@ -40,6 +40,8 @@ int main()
     init_i2c();
     ssd1306_setup(true);
     init_spi();
+    init_spi_cs(DAC_CS);
+    init_spi_cs(RAM_CS);
     printf("SPI inited\n");
     init_ram(RAM_CS);
 
