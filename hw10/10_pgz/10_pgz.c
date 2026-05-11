@@ -5,6 +5,8 @@
 #define BUTTON_1 22
 #define LED_1 21
 
+#define SERIAL_RATE 30.0
+
 volatile bool button_state = false;
 
 void gpio_callback(uint gpio, uint32_t events)
@@ -30,7 +32,7 @@ void gpio_callback(uint gpio, uint32_t events)
 int main()
 {
     await_usb(0, true);
-
+    breathe_led(0);
     gpio_init(BUTTON_1);
     gpio_set_dir(BUTTON_1, GPIO_IN);
 
@@ -51,6 +53,7 @@ int main()
         {
             gpio_put(LED_1, 0);
         }
-        printf("b: %d\n", button_state);
+        printf("(%d,%d)\n", button_state, !button_state);
+        sleep_ms(1000.0 / SERIAL_RATE);
     }
 }
