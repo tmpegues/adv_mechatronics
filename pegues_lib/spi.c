@@ -28,6 +28,8 @@ void write_dac(int cs_pin, uint16_t a_value, uint16_t b_value)
 {
     cs_select(cs_pin);
     uint8_t data[8];
+    printf("A value: %10b\n", a_value);
+
     if (a_value <= 0b1111111111) // We've only got 10 bits available
 
     { // MCP4912 write register (A[0]/B[1])(BUF)(GA)(SHDN)(4 bits of value), (6 bits of value)(2 bits ignored)
@@ -71,6 +73,6 @@ uint16_t ram_read_16(uint8_t cs_pin, uint16_t addr)
     cs_deselect(cs_pin);
 
     uint16_t value = read_data[0] << 8 | read_data[1];
-    // printf("addr, ram read: %16b %16b\n", addr, value);
+    // printf("addr, ram read (b), read (int): %16b %16b %d\n", addr, value, value);
     return value;
 }

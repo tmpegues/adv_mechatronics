@@ -27,10 +27,10 @@ union FloatInt
 bool dac_timer_callback(__unused struct repeating_timer *t)
 {
     static uint16_t sine_index = 0;
-    static union FloatInt sine_value;
-    sine_value.i = ram_read_16(RAM_CS, sine_index * 2 + 2);
+    static uint16_t  sine_value;
+    sine_value = ram_read_16(RAM_CS, sine_index * 2 + 2);
 
-    write_dac(DAC_CS, sine_value.f, -1);
+    write_dac(DAC_CS, sine_value, -1);
     sine_index = (sine_index + 1) % SINE_STEPS;
 }
 
@@ -82,7 +82,7 @@ int main()
     ssd1306_write(0, 0, message);
     ssd1306_update();
     sleep_ms(100);
-    add_repeating_timer_ms(-10, dac_timer_callback, NULL, &dac_timer);
+    add_repeating_timer_ms(-2, dac_timer_callback, NULL, &dac_timer);
 
     sprintf(message, "Looping");
     ssd1306_write(0, 0, message);
