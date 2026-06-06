@@ -54,3 +54,7 @@ If code from a specific assignment stops working, it's most likely because I've 
 
 14. [ ] [14: Load Cell](https://github.com/ndm736/ME433_2026/wiki/HW14)
     * [hw14 folder](./hw14)
+
+15. [x] [15: Paddle CAD](https://github.com/ndm736/ME433_2026/wiki/HW15)
+    * [hw15 folder](./hw15/)
+    ![real paddle photo](./hw15/paddle_real.jpg)
