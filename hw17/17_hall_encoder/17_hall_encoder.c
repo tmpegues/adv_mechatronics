@@ -7,7 +7,59 @@
 #define ENCODER_ADDR 0x36
 #define ENCODER_CONF 0x08
 #define ENCODER_ANGL 0x0C
+
+#define LOAD_SCK 16
+#define LOAD_DT 17
+#define PULSE 1
+
 uint8_t encoder_angl = ENCODER_ANGL;
+
+void init_load_cell()
+{
+    gpio_init(LOAD_SCK);
+    gpio_set_dir(LOAD_SCK, GPIO_OUT);
+
+    gpio_init(LOAD_DT);
+    gpio_set_dir(LOAD_DT, GPIO_IN);
+
+    gpio_put(LOAD_SCK, 1);
+    sleep_us(PULSE);
+    gpio_put(LOAD_SCK, 0);
+    sleep_us(PULSE);
+}
+
+int32_t read_load_cell()
+{
+    gpio_put(LOAD_SCK, 0);
+
+    while (gpio_get(LOAD_DT) == 1)
+    {
+    }
+
+    uint32_t raw_load = 0;
+    for (int i = 0; i < 24; i++) // Pulse 24 times for reading
+    {
+        gpio_put(LOAD_SCK, 1);
+        sleep_us(PULSE);
+
+        raw_load |= gpio_get(LOAD_DT) << 23 - i;
+
+        gpio_put(LOAD_SCK, 0);
+        sleep_us(PULSE);
+    }
+
+    if (raw_load & 0x800000)
+    {
+        raw_load |= 0xFF000000;
+    }
+
+    // Pulse 1 more time to set gain 128
+    gpio_put(LOAD_SCK, 1);
+    sleep_us(PULSE);
+    gpio_put(LOAD_SCK, 0);
+
+    return raw_load;
+}
 
 uint16_t read_encoder()
 {
@@ -25,11 +77,12 @@ int main()
     init_i2c();
     write_i2c(ENCODER_ADDR, ENCODER_CONF, 0 & 0b00 << 4);
 
-    char buffer;
+    init_load_cell();
+
     while (true)
     {
 
-        printf("(%d)\n", read_encoder());
+        printf("(%d, %d)\n", read_load_cell(), read_encoder());
 
         sleep_ms(100);
     }
