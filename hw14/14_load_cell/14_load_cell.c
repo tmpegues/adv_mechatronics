@@ -63,9 +63,12 @@ int main()
     while (true)
     {
         // Read an int to determine how many samples to collect
-        printf("How many samples?\n\n");
         int num_samples = 0;
-        scanf("%d", &num_samples);
+        while (num_samples <= 0)
+        {
+            printf("How many samples (>0)?\n\n");
+            scanf("%d", &num_samples);
+        }
         printf("Reading %d samples\n\n", num_samples);
 
         uint32_t raw_loads[num_samples];
@@ -76,11 +79,12 @@ int main()
         {
             raw_loads[i] = read_load_cell();
             times[i] = get_absolute_time();
+            iir_loads[i] = 0; // TODO
         }
         printf("Printing %d samples\n\n", num_samples);
         for (int i = 0; i < num_samples; i++)
         {
-            printf("%d %d\n", times[i], raw_loads[i]);
+            printf("%d %d %d\n",i , times[i], raw_loads[i], iir_loads[i]);
         }
     }
 }
