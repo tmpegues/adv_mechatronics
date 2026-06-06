@@ -4,7 +4,7 @@
 
 #define LOAD_SCK 16
 #define LOAD_DT 17
-#define PULSE 1
+#define PULSE 10
 
 int main()
 {
@@ -21,21 +21,28 @@ int main()
 
     while (true)
     {
+        gpio_put(LOAD_SCK, 0);
+
         if (gpio_get(LOAD_DT) == 1)
         {
-            printf("Load reading\n");
+            printf("Reading Load\n");
         }
         else
         {
             uint32_t raw_load = 0;
-            for (int i = 0; i <= 23; i++) // Pulse 24 times for reading
+            for (int i = 0; i < 24; i++) // Pulse 24 times for reading
             {
                 gpio_put(LOAD_SCK, 1);
                 sleep_ms(PULSE);
-                gpio_put(LOAD_SCK, 0);
 
-                raw_load |= gpio_get(LOAD_DT) << i;
-                printf("loop: %d, %d\n", i, raw_load);
+
+                raw_load |= gpio_get(LOAD_DT) << 24 - i;
+                // bool read = gpio_get(LOAD_DT);
+                printf("loop: %2d, %b\n", i, raw_load);
+                // printf("loop: %d, %d\n", i, read);
+
+                gpio_put(LOAD_SCK, 0);
+                sleep_ms(PULSE);
             }
             printf("raw: %d\n", raw_load);
             if (raw_load & 0x800000)
@@ -50,7 +57,7 @@ int main()
             gpio_put(LOAD_SCK, 0);
         }
 
-        sleep_ms(1000);
+        sleep_ms(10);
     }
 }
 
