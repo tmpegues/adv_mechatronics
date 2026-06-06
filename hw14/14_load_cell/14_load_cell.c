@@ -6,11 +6,8 @@
 #define LOAD_DT 17
 #define PULSE 1
 
-int main()
+void init_load_cell()
 {
-    await_usb(0, true);
-    breathe_led(0);
-
     gpio_init(LOAD_SCK);
     gpio_set_dir(LOAD_SCK, GPIO_OUT);
 
@@ -21,47 +18,52 @@ int main()
     sleep_us(PULSE);
     gpio_put(LOAD_SCK, 0);
     sleep_us(PULSE);
+}
+
+int32_t read_load_cell()
+{
+    gpio_put(LOAD_SCK, 0);
+
+    while (gpio_get(LOAD_DT) == 1)
+    {
+    }
+
+    uint32_t raw_load = 0;
+    for (int i = 0; i < 24; i++) // Pulse 24 times for reading
+    {
+        gpio_put(LOAD_SCK, 1);
+        sleep_us(PULSE);
+
+        raw_load |= gpio_get(LOAD_DT) << 23 - i;
+
+        gpio_put(LOAD_SCK, 0);
+        sleep_us(PULSE);
+
+    }
+
+    if (raw_load & 0x800000)
+    {
+        raw_load |= 0xFF000000;
+    }
+
+    // Pulse 1 more time to set gain 128
+    gpio_put(LOAD_SCK, 1);
+    sleep_us(PULSE);
+    gpio_put(LOAD_SCK, 0);
+
+    return raw_load;
+}
+
+int main()
+{
+    await_usb(0, true);
+    breathe_led(0);
+
+    init_load_cell();
 
     while (true)
     {
-        gpio_put(LOAD_SCK, 0);
-
-        if (gpio_get(LOAD_DT) == 1)
-        {
-            printf("Reading Load\n");
-        }
-        else
-        {
-            uint32_t raw_load = 0;
-            for (int i = 0; i < 24; i++) // Pulse 24 times for reading
-            {
-                gpio_put(LOAD_SCK, 1);
-                sleep_us(PULSE);
-
-
-                raw_load |= gpio_get(LOAD_DT) << 23 - i;
-                // bool read = gpio_get(LOAD_DT);
-                // printf("loop: %d, %d\n", i, read);
-
-                gpio_put(LOAD_SCK, 0);
-                sleep_us(PULSE);
-
-                printf("loop: %2d, %b\n", i, raw_load);
-            }
-            printf("raw: %d\n", raw_load);
-            if (raw_load & 0x800000)
-            {
-                raw_load |= 0xFF000000;
-            }
-            printf("moved: %d\n", raw_load);
-
-            // Pulse 1 more time to set gain 128
-            gpio_put(LOAD_SCK, 1);
-            sleep_us(PULSE);
-            gpio_put(LOAD_SCK, 0);
-        }
-
-        sleep_ms(1000);
+        printf("%d\n", read_load_cell());
     }
 }
 
@@ -69,7 +71,7 @@ int main()
 
 // X Write a function to initialize 2 GPIO pins for SCK (output) and DT (input).
 
-// Write a function to read out the 24 bits from the sensor, waiting until the DT pin is low,
+// X Write a function to read out the 24 bits from the sensor, waiting until the DT pin is low,
 // then blinking SCK 25 times, reading DT the first 24 times, and shifting the data and converting to a signed int.
 
 // Make a Pico project that initializes the HX711, and waits for the computer to send a number
