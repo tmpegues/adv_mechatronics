@@ -42,3 +42,15 @@ If code from a specific assignment stops working, it's most likely because I've 
 
 10. [x] [10: Python Graphics](https://github.com/ndm736/ME433_2026/wiki/HW10)
     * [hw10 folder](./hw10)
+
+11. [ ] [11: STM32/Pico UART](https://github.com/ndm736/ME433_2026/wiki/HW11)
+    * Started, but skipping (1/3)
+
+12. [ ] [12: STM32 CAN](https://github.com/ndm736/ME433_2026/wiki/HW12)
+    * Skipping (2/3)
+
+13. [ ] [13: PCB](https://github.com/ndm736/ME433_2026/wiki/HW13)
+    * Skipping (3/3)
+
+14. [ ] [14: Load Cell](https://github.com/ndm736/ME433_2026/wiki/HW14)
+    * [hw14 folder](./hw14)
