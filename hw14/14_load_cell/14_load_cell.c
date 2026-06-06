@@ -38,7 +38,6 @@ int32_t read_load_cell()
 
         gpio_put(LOAD_SCK, 0);
         sleep_us(PULSE);
-
     }
 
     if (raw_load & 0x800000)
@@ -63,7 +62,26 @@ int main()
 
     while (true)
     {
-        printf("%d\n", read_load_cell());
+        // Read an int to determine how many samples to collect
+        printf("How many samples?\n\n");
+        int num_samples = 0;
+        scanf("%d", &num_samples);
+        printf("Reading %d samples\n\n", num_samples);
+
+        uint32_t raw_loads[num_samples];
+        uint32_t iir_loads[num_samples];
+        absolute_time_t times[num_samples];
+
+        for (int i = 0; i < num_samples; i++)
+        {
+            raw_loads[i] = read_load_cell();
+            times[i] = get_absolute_time();
+        }
+        printf("Printing %d samples\n\n", num_samples);
+        for (int i = 0; i < num_samples; i++)
+        {
+            printf("%d %d\n", times[i], raw_loads[i]);
+        }
     }
 }
 
