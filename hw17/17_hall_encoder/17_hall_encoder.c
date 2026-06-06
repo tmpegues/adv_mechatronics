@@ -13,7 +13,7 @@ uint16_t read_encoder()
 {
     unsigned char buf[2];
     i2c_write_blocking(i2c_default, ENCODER_ADDR, &encoder_angl, 1, true); // true to keep host control of bus
-    i2c_read_blocking(i2c_default, ENCODER_ADDR, buf, 2, false); // false - finished with bus
+    i2c_read_blocking(i2c_default, ENCODER_ADDR, buf, 2, false);           // false - finished with bus
     return buf[0] << 8 | buf[1];
 }
 
@@ -25,8 +25,12 @@ int main()
     init_i2c();
     write_i2c(ENCODER_ADDR, ENCODER_CONF, 0 & 0b00 << 4);
 
+    char buffer;
     while (true)
     {
-        printf("%d\n", read_encoder());
+
+        printf("(%d)\n", read_encoder());
+
+        sleep_ms(100);
     }
 }
