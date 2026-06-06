@@ -58,3 +58,12 @@ If code from a specific assignment stops working, it's most likely because I've 
 15. [x] [15: Paddle CAD](https://github.com/ndm736/ME433_2026/wiki/HW15)
     * [hw15 folder](./hw15/)
     ![real paddle photo](./hw15/paddle_real.jpg)
+
+16. [ ] [16: STM Current Control](https://github.com/ndm736/ME433_2026/wiki/HW16)
+    * Skipping (4/3)
+
+17. [x] [17: Hall Encoder](https://github.com/ndm736/ME433_2026/wiki/HW17)
+    * [hw17 folder](./hw17)
+
+18. [ ] [18: Full project](https://github.com/ndm736/ME433_2026/wiki/HW18)
+    * [hw18 folder](./hw18)
