@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
-#include "../../pegues_lib.h"
+#include "hardware/pwm.h"
+#include "../../pegues_lib/pegues_lib.h"
 #include "ina219.h"
 
-#define IN1 16
-#define IN2 17
+#define IN1 18
+#define IN2 19
 
 #define PWMDIV 7.5
 #define WRAP 1000
@@ -51,10 +52,17 @@ int main()
 {
     await_usb(0, true);
     breathe_led(0);
+
     init_ina219();
     init_hbridge();
-    while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+
+    int duty = 0;
+    while (true)
+    {
+        printf("duty?: ");
+        scanf("%d", &duty);
+        duty *= 10;
+        printf("duty set: %d\n", duty);
+        set_bridge(duty);
     }
 }

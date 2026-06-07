@@ -62,6 +62,7 @@ target_include_directories(18_paddle PRIVATE
 target_link_libraries(18_paddle
                         hardware_i2c
                         hardware_spi
+                        hardware_pwm
                         pico_cyw43_arch_none
 )
 
