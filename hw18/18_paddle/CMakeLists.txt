@@ -35,7 +35,12 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(18_paddle 18_paddle.c )
+add_executable(18_paddle 18_paddle.c
+ina219.c
+../../pegues_lib/pegues_lib.c
+../../pegues_lib/ssd1306.c
+../../pegues_lib/i2c.c
+../../pegues_lib/spi.c)
 
 pico_set_program_name(18_paddle "18_paddle")
 pico_set_program_version(18_paddle "0.1")
@@ -54,9 +59,11 @@ target_include_directories(18_paddle PRIVATE
 )
 
 # Add any user requested libraries
-target_link_libraries(18_paddle 
-        
-        )
+target_link_libraries(18_paddle
+                        hardware_i2c
+                        hardware_spi
+                        pico_cyw43_arch_none
+)
 
 pico_add_extra_outputs(18_paddle)
 
