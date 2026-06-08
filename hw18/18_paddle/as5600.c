@@ -10,7 +10,7 @@
 #define I2C_INST i2c0
 
 void init_as5600(){
-    // init I2C on GP4 (SDA) and GP5 (SCL) on I2C0
+    // init I2C on GP__ (SDA) and GP__ (SCL) on I2C0 (update pinout as needed)
     i2c_init(I2C_INST, 400 * 1000); // baud of 400kHz
     gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
