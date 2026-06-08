@@ -132,8 +132,12 @@ bool current_loop_cb(struct repeating_timer *t)
 
 // PD position/force controller -> desired current, runs at ~80Hz (load cell rate)
 #define PD_HZ 80
-#define POS_CENTER 2650    // neutral paddle position in encoder counts (0..4095), tune
 #define MAX_CURRENT 500.0f // mA, hard clamp on the PI setpoint
+
+// neutral paddle position in encoder counts (0..4095). Default is a guess;
+// the 'x' command samples the encoder at rest and overwrites this. Read only
+// from the main thread (pd_controller / 'h' loop), so it needs no volatile.
+int pos_center = 2650;
 
 float kp_pd = 1;     // tune: mA per encoder count of position error
 float kd_pd = 0.000; // tune: mA per (count/s) of velocity (damping)
@@ -148,7 +152,7 @@ float kf = 0.0;      // tune: mA per raw HX711 count of user-applied force
 // feels compliant (kf > 0) or resistive (kf < 0) to the user's touch.
 float pd_controller(int position, float velocity, float force)
 {
-    float error = (float)(POS_CENTER - position);
+    float error = (float)(pos_center - position);
     float desired = -kp_pd * error - kd_pd * velocity + kf * force;
     printf("pos error, desired: %f %f\n", error, desired);
 
@@ -178,10 +182,11 @@ int main()
     char c = 0;
     while (true)
     {
-        printf("send 'a' for PI current test, 'h' for haptic run\n");
+        printf("send 'a' for PI current test, 'h' for haptic run, 'x' to calibrate center\n");
         scanf(" %c", &c);
         if (c == 'a')
         {
+            ctrl_state = 0; // stop the IRQ touching the integral before we reset it
             desired_current = 100; // mA target, tune as needed
             current_integral = 0;
             ctrl_counter = 0;
@@ -201,6 +206,7 @@ int main()
             int prev_position = read_as5600();
             absolute_time_t prev_time = get_absolute_time();
             int32_t force_offset = read_hx711(); // tare the load cell at rest
+            ctrl_state = 0;       // stop the IRQ touching the integral before we reset it
             current_integral = 0;
             ctrl_state = 2;
             printf("haptic run, send 's' to stop\n");
@@ -227,9 +233,17 @@ int main()
         }
         else if (c == 'x')
         {
-            int prev_position = read_as5600();
-            absolute_time_t prev_time = get_absolute_time();
-            int32_t force_offset = read_hx711(); // tare the load cell at rest
+            // calibrate the neutral paddle position: hold the paddle at rest,
+            // then average a burst of encoder samples and store it as pos_center.
+            const int n_cal = 64;
+            int32_t sum = 0;
+            for (int i = 0; i < n_cal; i++)
+            {
+                sum += read_as5600();
+                sleep_ms(5);
+            }
+            pos_center = (int)(sum / n_cal);
+            printf("calibrated pos_center = %d\n", pos_center);
         }
     }
 }
