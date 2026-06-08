@@ -53,7 +53,7 @@ void set_bridge(int duty)
 // PI current controller, runs in a 1kHz timer interrupt
 #define NSAMP 400 // samples to log per test sweep
 
-float kp = 0.1; // tune
+float kp = 0.1;  // tune
 float ki = 0.05; // tune
 
 volatile float desired_current = 0; // mA, the current loop setpoint
@@ -81,7 +81,7 @@ int pi_current_step(float actual)
     }
 
     float u = kp * error + ki * current_integral;
-    int duty = (int)u; //replaces the int duty = 0 line from previous version.
+    int duty = (int)u; // replaces the int duty = 0 line from previous version.
     // instead of manually setting duty, duty is now set by the PI controller output u (calculated from the error and integral terms). *Verify this logic is correct*
     // this allows the controller to adjust the duty cycle based on how far off the actual current is from the desired current, and how long it has been off (integral term).
     if (duty > WRAP)
@@ -132,12 +132,12 @@ bool current_loop_cb(struct repeating_timer *t)
 
 // PD position/force controller -> desired current, runs at ~80Hz (load cell rate)
 #define PD_HZ 80
-#define POS_CENTER 2048 // neutral paddle position in encoder counts (0..4095), tune
+#define POS_CENTER 2650    // neutral paddle position in encoder counts (0..4095), tune
 #define MAX_CURRENT 500.0f // mA, hard clamp on the PI setpoint
 
-float kp_pd = 0.05;  // tune: mA per encoder count of position error
-float kd_pd = 0.001; // tune: mA per (count/s) of velocity (damping)
-float kf    = 0.01;  // tune: mA per raw HX711 count of user-applied force
+float kp_pd = 1;     // tune: mA per encoder count of position error
+float kd_pd = 0.000; // tune: mA per (count/s) of velocity (damping)
+float kf = 0.0;      // tune: mA per raw HX711 count of user-applied force
                      //   kf > 0: motor amplifies user push (power assist)
                      //   kf < 0: motor opposes user push (renders stiffness / wall)
                      //   flip sign if load cell is mounted in the opposite direction
@@ -148,12 +148,15 @@ float kf    = 0.01;  // tune: mA per raw HX711 count of user-applied force
 // feels compliant (kf > 0) or resistive (kf < 0) to the user's touch.
 float pd_controller(int position, float velocity, float force)
 {
-    float error   = (float)(POS_CENTER - position);
-    float desired = kp_pd * error - kd_pd * velocity + kf * force;
+    float error = (float)(POS_CENTER - position);
+    float desired = -kp_pd * error - kd_pd * velocity + kf * force;
+    printf("pos error, desired: %f %f\n", error, desired);
 
     // clamp so the PI inner loop is never asked for more than MAX_CURRENT
-    if (desired >  MAX_CURRENT) desired =  MAX_CURRENT;
-    if (desired < -MAX_CURRENT) desired = -MAX_CURRENT;
+    if (desired > MAX_CURRENT)
+        desired = MAX_CURRENT;
+    if (desired < -MAX_CURRENT)
+        desired = -MAX_CURRENT;
 
     return desired; // mA, consumed by the PI current loop
 }
@@ -221,6 +224,12 @@ int main()
             ctrl_state = 0;
             desired_current = 0;
             set_bridge(0);
+        }
+        else if (c == 'x')
+        {
+            int prev_position = read_as5600();
+            absolute_time_t prev_time = get_absolute_time();
+            int32_t force_offset = read_hx711(); // tare the load cell at rest
         }
     }
 }
