@@ -121,7 +121,30 @@ bool current_loop_cb(struct repeating_timer *t)
             current_integral = 0;
         }
     }
+    else if (ctrl_state == 2)
+    {
+        // haptic run: track desired_current set by the PD loop
+        set_bridge(pi_current_step(read_ina219()));
+    }
     return true; // keep repeating
+}
+
+// PD position/force controller -> desired current, runs at ~80Hz (load cell rate)
+#define PD_HZ 80
+#define POS_CENTER 2048 // neutral paddle position in encoder counts (0..4095), tune
+
+float kp_pd = 0.05; // tune: desired current (mA) per encoder count of position error
+float kd_pd = 0.001; // tune: damping, desired current (mA) per (count/s) of velocity
+
+// map measured position (and force) to a desired current for a haptic effect.
+// placeholder effect: virtual spring centering the paddle, with velocity damping.
+// the position->force shape (bump, dip, detent, ...) is designed in a later step.
+float pd_controller(int position, float velocity, float force)
+{
+    // force is the load cell reading, wired in once the HX711 is integrated
+    float error = (float)(POS_CENTER - position);
+    float desired = kp_pd * error - kd_pd * velocity;
+    return desired; // desired current in mA, consumed by the PI loop
 }
 
 int main()
@@ -140,7 +163,7 @@ int main()
     char c = 0;
     while (true)
     {
-        printf("send 'a' to run PI current test\n");
+        printf("send 'a' for PI current test, 'h' for haptic run\n");
         scanf(" %c", &c);
         if (c == 'a')
         {
@@ -156,6 +179,34 @@ int main()
             {
                 printf("%d %.2f %.2f\n", i, desired_log[i], actual_log[i]);
             }
+        }
+        else if (c == 'h')
+        {
+            // PD position loop sets desired_current at ~80Hz, PI loop tracks it
+            int prev_position = read_as5600();
+            absolute_time_t prev_time = get_absolute_time();
+            current_integral = 0;
+            ctrl_state = 2;
+            printf("haptic run, send 's' to stop\n");
+            while (true)
+            {
+                int position = read_as5600();
+                absolute_time_t now = get_absolute_time();
+                float dt = absolute_time_diff_us(prev_time, now) / 1e6f;
+                float velocity = (position - prev_position) / dt;
+                desired_current = pd_controller(position, velocity, 0.0f);
+                prev_position = position;
+                prev_time = now;
+
+                if (getchar_timeout_us(0) == 's')
+                {
+                    break;
+                }
+                sleep_ms(1000 / PD_HZ);
+            }
+            ctrl_state = 0;
+            desired_current = 0;
+            set_bridge(0);
         }
     }
 }
