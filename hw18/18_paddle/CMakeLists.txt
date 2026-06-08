@@ -38,6 +38,7 @@ pico_sdk_init()
 add_executable(18_paddle 18_paddle.c
 ina219.c
 as5600.c
+hx711.c
 ../../pegues_lib/pegues_lib.c
 ../../pegues_lib/ssd1306.c
 ../../pegues_lib/i2c.c

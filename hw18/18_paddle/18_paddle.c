@@ -4,6 +4,7 @@
 #include "../../pegues_lib/pegues_lib.h"
 #include "ina219.h"
 #include "as5600.h"
+#include "hx711.h"
 
 #define IN1 18
 #define IN2 19
@@ -52,8 +53,8 @@ void set_bridge(int duty)
 // PI current controller, runs in a 1kHz timer interrupt
 #define NSAMP 400 // samples to log per test sweep
 
-float kp = 2.0; // tune
-float ki = 0.1; // tune
+float kp = 0.1; // tune
+float ki = 0.05; // tune
 
 volatile float desired_current = 0; // mA, the current loop setpoint
 volatile float current_integral = 0;
@@ -132,19 +133,29 @@ bool current_loop_cb(struct repeating_timer *t)
 // PD position/force controller -> desired current, runs at ~80Hz (load cell rate)
 #define PD_HZ 80
 #define POS_CENTER 2048 // neutral paddle position in encoder counts (0..4095), tune
+#define MAX_CURRENT 500.0f // mA, hard clamp on the PI setpoint
 
-float kp_pd = 0.05; // tune: desired current (mA) per encoder count of position error
-float kd_pd = 0.001; // tune: damping, desired current (mA) per (count/s) of velocity
+float kp_pd = 0.05;  // tune: mA per encoder count of position error
+float kd_pd = 0.001; // tune: mA per (count/s) of velocity (damping)
+float kf    = 0.01;  // tune: mA per raw HX711 count of user-applied force
+                     //   kf > 0: motor amplifies user push (power assist)
+                     //   kf < 0: motor opposes user push (renders stiffness / wall)
+                     //   flip sign if load cell is mounted in the opposite direction
 
-// map measured position (and force) to a desired current for a haptic effect.
-// placeholder effect: virtual spring centering the paddle, with velocity damping.
-// the position->force shape (bump, dip, detent, ...) is designed in a later step.
+// map measured position, velocity, and user-applied force to a desired current.
+// position spring + velocity damping hold a virtual equilibrium; the force term
+// lets the load cell reading directly modulate the motor output so the device
+// feels compliant (kf > 0) or resistive (kf < 0) to the user's touch.
 float pd_controller(int position, float velocity, float force)
 {
-    // force is the load cell reading, wired in once the HX711 is integrated
-    float error = (float)(POS_CENTER - position);
-    float desired = kp_pd * error - kd_pd * velocity;
-    return desired; // desired current in mA, consumed by the PI loop
+    float error   = (float)(POS_CENTER - position);
+    float desired = kp_pd * error - kd_pd * velocity + kf * force;
+
+    // clamp so the PI inner loop is never asked for more than MAX_CURRENT
+    if (desired >  MAX_CURRENT) desired =  MAX_CURRENT;
+    if (desired < -MAX_CURRENT) desired = -MAX_CURRENT;
+
+    return desired; // mA, consumed by the PI current loop
 }
 
 int main()
@@ -154,6 +165,7 @@ int main()
 
     init_ina219();
     init_as5600();
+    init_hx711();
     init_hbridge();
 
     // run the current loop at 1kHz (negative period = fixed 1000us rate)
@@ -185,16 +197,19 @@ int main()
             // PD position loop sets desired_current at ~80Hz, PI loop tracks it
             int prev_position = read_as5600();
             absolute_time_t prev_time = get_absolute_time();
+            int32_t force_offset = read_hx711(); // tare the load cell at rest
             current_integral = 0;
             ctrl_state = 2;
             printf("haptic run, send 's' to stop\n");
             while (true)
             {
+                // the load cell read blocks until the next HX711 sample, pacing the loop at ~80Hz
+                float force = (float)(read_hx711() - force_offset);
                 int position = read_as5600();
                 absolute_time_t now = get_absolute_time();
                 float dt = absolute_time_diff_us(prev_time, now) / 1e6f;
                 float velocity = (position - prev_position) / dt;
-                desired_current = pd_controller(position, velocity, 0.0f);
+                desired_current = pd_controller(position, velocity, force);
                 prev_position = position;
                 prev_time = now;
 
@@ -202,7 +217,6 @@ int main()
                 {
                     break;
                 }
-                sleep_ms(1000 / PD_HZ);
             }
             ctrl_state = 0;
             desired_current = 0;
