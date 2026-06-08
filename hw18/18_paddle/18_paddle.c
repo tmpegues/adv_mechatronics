@@ -3,6 +3,7 @@
 #include "hardware/pwm.h"
 #include "../../pegues_lib/pegues_lib.h"
 #include "ina219.h"
+#include "as5600.h"
 
 #define IN1 18
 #define IN2 19
@@ -54,6 +55,7 @@ int main()
     breathe_led(0);
 
     init_ina219();
+    init_as5600();
     init_hbridge();
 
     int duty = 0;
@@ -64,5 +66,6 @@ int main()
         duty *= 10;
         printf("duty set: %d\n", duty);
         set_bridge(duty);
+        printf("encoder angle: %d\n", read_as5600());
     }
 }
