@@ -49,8 +49,9 @@ If code from a specific assignment stops working, it's most likely because I've 
 12. [ ] [12: STM32 CAN](https://github.com/ndm736/ME433_2026/wiki/HW12)
     * Skipping (2/3)
 
-13. [ ] [13: PCB](https://github.com/ndm736/ME433_2026/wiki/HW13)
-    * Skipping (3/3)
+13. [x] [13: PCB](https://github.com/ndm736/ME433_2026/wiki/HW13)
+    * [hw13 folder](./hw13)
+    ![PCB layout](./hw13/layout.png)
 
 14. [ ] [14: Load Cell](https://github.com/ndm736/ME433_2026/wiki/HW14)
     * [hw14 folder](./hw14)
@@ -60,7 +61,7 @@ If code from a specific assignment stops working, it's most likely because I've 
     ![real paddle photo](./hw15/paddle_real.jpg)
 
 16. [ ] [16: STM Current Control](https://github.com/ndm736/ME433_2026/wiki/HW16)
-    * Skipping (4/3)
+    * Skipping (3/3)
 
 17. [x] [17: Hall Encoder](https://github.com/ndm736/ME433_2026/wiki/HW17)
     * [hw17 folder](./hw17)
