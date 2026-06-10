@@ -132,12 +132,12 @@ bool current_loop_cb(struct repeating_timer *t)
 
 // PD position/force controller -> desired current, runs at ~80Hz (load cell rate)
 #define PD_HZ 80
-#define POS_CENTER 2048 // neutral paddle position in encoder counts (0..4095), tune
+#define POS_CENTER 3290    // neutral paddle position in encoder counts (0..4095), tune
 #define MAX_CURRENT 500.0f // mA, hard clamp on the PI setpoint
 
-float kp_pd = 0.05;  // tune: mA per encoder count of position error
-float kd_pd = 0.001; // tune: mA per (count/s) of velocity (damping)
-float kf    = 0.01;  // tune: mA per raw HX711 count of user-applied force
+float kp_pd = .5;  // tune: mA per encoder count of position error
+float kd_pd = 0; // tune: mA per (count/s) of velocity (damping)
+float kf    = 0;  // tune: mA per raw HX711 count of user-applied force
                      //   kf > 0: motor amplifies user push (power assist)
                      //   kf < 0: motor opposes user push (renders stiffness / wall)
                      //   flip sign if load cell is mounted in the opposite direction
@@ -154,7 +154,7 @@ float pd_controller(int position, float velocity, float force)
     // clamp so the PI inner loop is never asked for more than MAX_CURRENT
     if (desired >  MAX_CURRENT) desired =  MAX_CURRENT;
     if (desired < -MAX_CURRENT) desired = -MAX_CURRENT;
-
+    printf("%d %f\n", position, error);
     return desired; // mA, consumed by the PI current loop
 }
 
