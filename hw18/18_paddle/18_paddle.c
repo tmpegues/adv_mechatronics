@@ -53,7 +53,7 @@ void set_bridge(int duty)
 // PI current controller, runs in a 1kHz timer interrupt
 #define NSAMP 400 // samples to log per test sweep
 
-float kp = 0.1; // tune
+float kp = 0.1;  // tune
 float ki = 0.05; // tune
 
 volatile float desired_current = 0; // mA, the current loop setpoint
@@ -81,7 +81,7 @@ int pi_current_step(float actual)
     }
 
     float u = kp * error + ki * current_integral;
-    int duty = (int)u; //replaces the int duty = 0 line from previous version.
+    int duty = (int)u; // replaces the int duty = 0 line from previous version.
     // instead of manually setting duty, duty is now set by the PI controller output u (calculated from the error and integral terms). *Verify this logic is correct*
     // this allows the controller to adjust the duty cycle based on how far off the actual current is from the desired current, and how long it has been off (integral term).
     if (duty > WRAP)
@@ -135,12 +135,12 @@ bool current_loop_cb(struct repeating_timer *t)
 #define POS_CENTER 3290    // neutral paddle position in encoder counts (0..4095), tune
 #define MAX_CURRENT 500.0f // mA, hard clamp on the PI setpoint
 
-float kp_pd = .5;  // tune: mA per encoder count of position error
+float kp_pd = 0; // tune: mA per encoder count of position error
 float kd_pd = 0; // tune: mA per (count/s) of velocity (damping)
-float kf    = 0;  // tune: mA per raw HX711 count of user-applied force
-                     //   kf > 0: motor amplifies user push (power assist)
-                     //   kf < 0: motor opposes user push (renders stiffness / wall)
-                     //   flip sign if load cell is mounted in the opposite direction
+float kf = -10;   // tune: mA per raw HX711 count of user-applied force
+                 //   kf > 0: motor amplifies user push (power assist)
+                 //   kf < 0: motor opposes user push (renders stiffness / wall)
+                 //   flip sign if load cell is mounted in the opposite direction
 
 // map measured position, velocity, and user-applied force to a desired current.
 // position spring + velocity damping hold a virtual equilibrium; the force term
@@ -148,13 +148,19 @@ float kf    = 0;  // tune: mA per raw HX711 count of user-applied force
 // feels compliant (kf > 0) or resistive (kf < 0) to the user's touch.
 float pd_controller(int position, float velocity, float force)
 {
-    float error   = (float)(POS_CENTER - position);
+    float error = (float)(POS_CENTER - position);
+    if (force <= 1 || force >=10)
+    {
+        force = 0.0;
+    }
     float desired = kp_pd * error - kd_pd * velocity + kf * force;
 
     // clamp so the PI inner loop is never asked for more than MAX_CURRENT
-    if (desired >  MAX_CURRENT) desired =  MAX_CURRENT;
-    if (desired < -MAX_CURRENT) desired = -MAX_CURRENT;
-    printf("%d %f\n", position, error);
+    if (desired > MAX_CURRENT)
+        desired = MAX_CURRENT;
+    if (desired < -MAX_CURRENT)
+        desired = -MAX_CURRENT;
+    printf("%f: %d %f %f\n", desired, position, error, force);
     return desired; // mA, consumed by the PI current loop
 }
 
@@ -177,6 +183,7 @@ int main()
     {
         printf("send 'a' for PI current test, 'h' for haptic run\n");
         scanf(" %c", &c);
+        printf("chose %c", c);
         if (c == 'a')
         {
             desired_current = 100; // mA target, tune as needed
@@ -200,11 +207,13 @@ int main()
             int32_t force_offset = read_hx711(); // tare the load cell at rest
             current_integral = 0;
             ctrl_state = 2;
+            float force = 0;
             printf("haptic run, send 's' to stop\n");
             while (true)
             {
                 // the load cell read blocks until the next HX711 sample, pacing the loop at ~80Hz
-                float force = (float)(read_hx711() - force_offset);
+                force = (0.9* force + 0.1 *(float)(read_hx711() - force_offset)) / 1000;
+                // printf("force: %f\n", force);
                 int position = read_as5600();
                 absolute_time_t now = get_absolute_time();
                 float dt = absolute_time_diff_us(prev_time, now) / 1e6f;
@@ -222,5 +231,6 @@ int main()
             desired_current = 0;
             set_bridge(0);
         }
+        printf("What");
     }
 }
